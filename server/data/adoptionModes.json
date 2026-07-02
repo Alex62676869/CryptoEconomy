@@ -1,0 +1,128 @@
+{
+  "version": "1.0.0",
+  "purpose": "Adoption mode settings for the Mono & DIV Economy Game. Adoption mode changes how quickly demand and adoption can grow. It does not directly change difficulty.",
+  "defaultAdoptionMode": "normal",
+  "principle": "High adoption is not automatically easier. Faster adoption can create bubbles, liquidity stress, treasury inventory depletion, regulatory attention, and weaker adoption quality.",
+  "modes": {
+    "low": {
+      "label": "Low Demand",
+      "description": "Slow public interest, slower trial use, weaker speculation, and less regulatory attention.",
+      "awarenessMultiplier": 0.5,
+      "trialMultiplier": 0.5,
+      "stickyAdoptionMultiplier": 0.65,
+      "speculationMultiplier": 0.65,
+      "merchantAdoptionMultiplier": 0.65,
+      "businessAdoptionMultiplier": 0.65,
+      "institutionalAdoptionMultiplier": 0.5,
+      "regulatoryAttentionMultiplier": 0.75,
+      "liquidityStressMultiplier": 0.75,
+      "bubbleRiskMultiplier": 0.6,
+      "churnMultiplier": 0.85,
+      "adoptionQualityBias": 6,
+      "notes": [
+        "Useful for testing slow-growth economies.",
+        "Treasury inventory is usually easier to preserve.",
+        "Fiat displacement will be much slower."
+      ]
+    },
+
+    "normal": {
+      "label": "Normal Demand",
+      "description": "Balanced default adoption mode. Demand and adoption grow at a plausible base rate.",
+      "awarenessMultiplier": 1,
+      "trialMultiplier": 1,
+      "stickyAdoptionMultiplier": 1,
+      "speculationMultiplier": 1,
+      "merchantAdoptionMultiplier": 1,
+      "businessAdoptionMultiplier": 1,
+      "institutionalAdoptionMultiplier": 1,
+      "regulatoryAttentionMultiplier": 1,
+      "liquidityStressMultiplier": 1,
+      "bubbleRiskMultiplier": 1,
+      "churnMultiplier": 1,
+      "adoptionQualityBias": 0,
+      "notes": [
+        "Recommended default mode.",
+        "Designed to work with Normal difficulty.",
+        "Growth can be good or dangerous depending on liquidity and treasury control."
+      ]
+    },
+
+    "high": {
+      "label": "High Demand",
+      "description": "Faster attention, trial use, speculative demand, and adoption growth. More upside, but more stress.",
+      "awarenessMultiplier": 1.8,
+      "trialMultiplier": 1.8,
+      "stickyAdoptionMultiplier": 1.35,
+      "speculationMultiplier": 1.8,
+      "merchantAdoptionMultiplier": 1.25,
+      "businessAdoptionMultiplier": 1.2,
+      "institutionalAdoptionMultiplier": 1.15,
+      "regulatoryAttentionMultiplier": 1.4,
+      "liquidityStressMultiplier": 1.35,
+      "bubbleRiskMultiplier": 1.5,
+      "churnMultiplier": 1.15,
+      "adoptionQualityBias": -4,
+      "notes": [
+        "Good for testing growth stress.",
+        "Can drain treasury coin inventory faster.",
+        "Can increase DIV overheating risk.",
+        "Can increase regulatory pressure earlier."
+      ]
+    },
+
+    "hyper": {
+      "label": "Hyper Adoption",
+      "description": "Extreme attention and demand. This is a stress-test mode where adoption can outrun liquidity, treasury capacity, and regulatory tolerance.",
+      "awarenessMultiplier": 3,
+      "trialMultiplier": 3,
+      "stickyAdoptionMultiplier": 1.8,
+      "speculationMultiplier": 3.5,
+      "merchantAdoptionMultiplier": 1.6,
+      "businessAdoptionMultiplier": 1.45,
+      "institutionalAdoptionMultiplier": 1.25,
+      "regulatoryAttentionMultiplier": 2.2,
+      "liquidityStressMultiplier": 2,
+      "bubbleRiskMultiplier": 2.5,
+      "churnMultiplier": 1.45,
+      "adoptionQualityBias": -10,
+      "notes": [
+        "This mode is not automatically easy.",
+        "Demand can overwhelm treasury execution.",
+        "DIV can overheat quickly.",
+        "Mono may face support tests if adoption quality is weak.",
+        "Regulatory and banking friction should rise earlier."
+      ]
+    }
+  },
+
+  "qualityRules": {
+    "highQualityAdoption": [
+      "Recurring Mono use",
+      "Merchant acceptance",
+      "Business settlement",
+      "Sticky users",
+      "Low churn",
+      "Stable liquidity",
+      "Low speculative share",
+      "Trust-supported demand"
+    ],
+    "lowQualityAdoption": [
+      "Temporary hype",
+      "Promotion-only demand",
+      "High speculative share",
+      "Low merchant support",
+      "High churn",
+      "Price-only interest",
+      "Weak liquidity",
+      "Growth that depends on unsustainable dividend expectations"
+    ]
+  },
+
+  "engineNotes": {
+    "demandIsFlow": "Demand is the amount of desired buying or selling during a period.",
+    "adoptionIsStock": "Adoption is the accumulated base of users, merchants, businesses, and institutions.",
+    "attentionIsNotAdoption": "A viral event can increase awareness without creating durable economic use.",
+    "fastGrowthCanBeFragile": "Fast adoption should increase upside and stress at the same time."
+  }
+}
