@@ -1,0 +1,571 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Economy Audit | Mono & DIV</title>
+
+  <link rel="stylesheet" href="/styles.css" />
+
+  <style>
+    .audit-table {
+      position: relative;
+      z-index: 1;
+      width: 100%;
+      margin-top: 18px;
+      border-collapse: collapse;
+      overflow: hidden;
+      border-radius: 18px;
+    }
+
+    .audit-table th,
+    .audit-table td {
+      padding: 12px 14px;
+      border-bottom: 1px solid rgba(148, 163, 184, 0.14);
+      color: var(--text-2);
+      text-align: left;
+      font-size: 0.9rem;
+    }
+
+    .audit-table th {
+      color: var(--text-3);
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      background: rgba(2, 6, 23, 0.32);
+    }
+
+    .audit-table tr:last-child td {
+      border-bottom: 0;
+    }
+
+    .audit-table strong {
+      color: var(--text-1);
+    }
+
+    .audit-meter {
+      position: relative;
+      z-index: 1;
+      height: 10px;
+      margin-top: 8px;
+      overflow: hidden;
+      border-radius: 999px;
+      background: rgba(148, 163, 184, 0.16);
+    }
+
+    .audit-meter span {
+      display: block;
+      height: 100%;
+      width: 0%;
+      border-radius: inherit;
+      background: linear-gradient(90deg, var(--bad), var(--warn), var(--good));
+      transition: width 220ms ease;
+    }
+
+    .page-links {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .page-links a {
+      min-height: 40px;
+      display: inline-flex;
+      align-items: center;
+      padding: 0 14px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      color: var(--text-2);
+      background: rgba(15, 23, 42, 0.78);
+    }
+
+    .page-links a:hover {
+      color: var(--text-1);
+      border-color: var(--line-strong);
+    }
+  </style>
+</head>
+
+<body>
+  <div class="app-shell">
+    <header class="topbar">
+      <div class="brand">
+        <div class="brand-mark">M/D</div>
+        <div>
+          <h1>Economy Audit</h1>
+          <p>Live health check for Mono, DIV, trust, adoption, and fiat displacement</p>
+        </div>
+      </div>
+
+      <div class="topbar-actions page-links">
+        <a href="/" target="_blank" rel="noopener noreferrer">Dashboard</a>
+        <a href="/treasury" target="_blank" rel="noopener noreferrer">Treasury</a>
+        <a href="/defaults" target="_blank" rel="noopener noreferrer">Defaults</a>
+      </div>
+    </header>
+
+    <main class="dashboard">
+      <section class="hero-grid">
+        <article class="market-card market-card--mono">
+          <div class="card-heading">
+            <div>
+              <p class="eyebrow">Mono health</p>
+              <h2 id="monoHealth">0/100</h2>
+            </div>
+            <span class="asset-badge asset-badge--mono">Stability</span>
+          </div>
+
+          <div class="mini-stats">
+            <div>
+              <span>Market Price</span>
+              <strong id="monoPrice">$1.0000</strong>
+            </div>
+            <div>
+              <span>Fundamental</span>
+              <strong id="monoFundamental">$1.0000</strong>
+            </div>
+            <div>
+              <span>Liquidity</span>
+              <strong id="monoLiquidity">0/100</strong>
+            </div>
+            <div>
+              <span>Adoption Quality</span>
+              <strong id="monoAdoptionQuality">0/100</strong>
+            </div>
+          </div>
+        </article>
+
+        <article class="market-card market-card--div">
+          <div class="card-heading">
+            <div>
+              <p class="eyebrow">DIV health</p>
+              <h2 id="divHealth">0/100</h2>
+            </div>
+            <span class="asset-badge asset-badge--div">Growth</span>
+          </div>
+
+          <div class="mini-stats">
+            <div>
+              <span>Market Price</span>
+              <strong id="divPrice">$1.0000</strong>
+            </div>
+            <div>
+              <span>Fundamental</span>
+              <strong id="divFundamental">$1.0000</strong>
+            </div>
+            <div>
+              <span>Liquidity</span>
+              <strong id="divLiquidity">0/100</strong>
+            </div>
+            <div>
+              <span>Overheating</span>
+              <strong id="divOverheating">0/100</strong>
+            </div>
+          </div>
+        </article>
+
+        <article class="market-card market-card--treasury">
+          <div class="card-heading">
+            <div>
+              <p class="eyebrow">System health</p>
+              <h2 id="systemHealth">0/100</h2>
+            </div>
+            <span class="asset-badge asset-badge--treasury">Economy</span>
+          </div>
+
+          <div class="mini-stats">
+            <div>
+              <span>Trust</span>
+              <strong id="systemicTrust">0/100</strong>
+            </div>
+            <div>
+              <span>Treasury Control</span>
+              <strong id="treasuryControl">0/100</strong>
+            </div>
+            <div>
+              <span>Fiat Displacement</span>
+              <strong id="fiatDisplacement">0/100</strong>
+            </div>
+            <div>
+              <span>Regime</span>
+              <strong id="marketRegime">Calm</strong>
+            </div>
+          </div>
+        </article>
+      </section>
+
+      <section class="content-grid">
+        <article class="panel">
+          <div class="panel-header">
+            <div>
+              <p class="eyebrow">Mono audit</p>
+              <h3>Stability asset</h3>
+            </div>
+          </div>
+
+          <table class="audit-table">
+            <tbody id="monoAuditTable"></tbody>
+          </table>
+        </article>
+
+        <article class="panel">
+          <div class="panel-header">
+            <div>
+              <p class="eyebrow">DIV audit</p>
+              <h3>Growth asset</h3>
+            </div>
+          </div>
+
+          <table class="audit-table">
+            <tbody id="divAuditTable"></tbody>
+          </table>
+        </article>
+
+        <article class="panel">
+          <div class="panel-header">
+            <div>
+              <p class="eyebrow">Adoption</p>
+              <h3>Network usage</h3>
+            </div>
+          </div>
+
+          <table class="audit-table">
+            <tbody id="adoptionTable"></tbody>
+          </table>
+        </article>
+
+        <article class="panel">
+          <div class="panel-header">
+            <div>
+              <p class="eyebrow">Fiat displacement</p>
+              <h3>Monetary transition</h3>
+            </div>
+          </div>
+
+          <div class="stacked-stats">
+            <div>
+              <span>Stage</span>
+              <strong id="fiatStage">Fiat dominant</strong>
+            </div>
+            <div>
+              <span>Fiat Usefulness</span>
+              <strong id="fiatUsefulness">0/100</strong>
+              <div class="audit-meter"><span id="fiatUsefulnessMeter"></span></div>
+            </div>
+            <div>
+              <span>Government Resistance</span>
+              <strong id="governmentResistance">0/100</strong>
+              <div class="audit-meter"><span id="governmentResistanceMeter"></span></div>
+            </div>
+            <div>
+              <span>Unit of Account Adoption</span>
+              <strong id="unitOfAccount">0/100</strong>
+              <div class="audit-meter"><span id="unitOfAccountMeter"></span></div>
+            </div>
+          </div>
+        </article>
+      </section>
+
+      <section class="bottom-grid">
+        <article class="panel">
+          <div class="panel-header">
+            <div>
+              <p class="eyebrow">Warnings</p>
+              <h3>What needs attention</h3>
+            </div>
+          </div>
+
+          <div class="message-list" id="warningList">
+            <p class="empty-state">No warnings yet.</p>
+          </div>
+        </article>
+
+        <article class="panel">
+          <div class="panel-header">
+            <div>
+              <p class="eyebrow">Explanations</p>
+              <h3>Current reasons</h3>
+            </div>
+          </div>
+
+          <div class="message-list" id="explanationList">
+            <p class="empty-state">Waiting for explanations.</p>
+          </div>
+        </article>
+
+        <article class="panel">
+          <div class="panel-header">
+            <div>
+              <p class="eyebrow">Active scenarios</p>
+              <h3>Shock layer</h3>
+            </div>
+          </div>
+
+          <div class="message-list" id="scenarioList">
+            <p class="empty-state">No active scenarios.</p>
+          </div>
+        </article>
+      </section>
+    </main>
+  </div>
+
+  <script>
+    "use strict";
+
+    const elements = {};
+    const ids = [
+      "monoHealth", "monoPrice", "monoFundamental", "monoLiquidity", "monoAdoptionQuality",
+      "divHealth", "divPrice", "divFundamental", "divLiquidity", "divOverheating",
+      "systemHealth", "systemicTrust", "treasuryControl", "fiatDisplacement", "marketRegime",
+      "monoAuditTable", "divAuditTable", "adoptionTable",
+      "fiatStage", "fiatUsefulness", "fiatUsefulnessMeter",
+      "governmentResistance", "governmentResistanceMeter",
+      "unitOfAccount", "unitOfAccountMeter",
+      "warningList", "explanationList", "scenarioList"
+    ];
+
+    for (const id of ids) {
+      elements[id] = document.getElementById(id);
+    }
+
+    fetchState();
+    setInterval(fetchState, 1500);
+
+    async function fetchState() {
+      try {
+        const response = await fetch("/api/state", {
+          headers: {
+            Accept: "application/json"
+          }
+        });
+
+        if (!response.ok) {
+          throw new Error("State request failed");
+        }
+
+        render(await response.json());
+      } catch (error) {
+        console.warn(error.message);
+      }
+    }
+
+    function render(state) {
+      const monoHealth = average([
+        state?.confidence?.monoStabilityTrust,
+        state?.market?.mono?.liquidity,
+        state?.adoption?.mono?.adoptionQuality,
+        state?.treasury?.mono?.controlScore
+      ]);
+
+      const divHealth = average([
+        state?.confidence?.divDividendTrust,
+        state?.market?.div?.liquidity,
+        state?.adoption?.div?.adoptionQuality,
+        100 - Number(state?.prices?.div?.overheatingScore || 0),
+        state?.treasury?.div?.controlScore
+      ]);
+
+      const systemHealth = average([
+        state?.confidence?.systemicTrust,
+        state?.treasury?.controlScore,
+        state?.adoption?.mono?.adoptionQuality,
+        state?.confidence?.liquidityTrust,
+        state?.confidence?.regulatorySurvivalTrust
+      ]);
+
+      setText(elements.monoHealth, formatScore(monoHealth));
+      setText(elements.divHealth, formatScore(divHealth));
+      setText(elements.systemHealth, formatScore(systemHealth));
+
+      setText(elements.monoPrice, formatUsd(state?.prices?.mono?.market, 4));
+      setText(elements.monoFundamental, formatUsd(state?.prices?.mono?.fundamental, 4));
+      setText(elements.monoLiquidity, formatScore(state?.market?.mono?.liquidity));
+      setText(elements.monoAdoptionQuality, formatScore(state?.adoption?.mono?.adoptionQuality));
+
+      setText(elements.divPrice, formatUsd(state?.prices?.div?.market, 4));
+      setText(elements.divFundamental, formatUsd(state?.prices?.div?.fundamental, 4));
+      setText(elements.divLiquidity, formatScore(state?.market?.div?.liquidity));
+      setText(elements.divOverheating, formatScore(state?.prices?.div?.overheatingScore));
+
+      setText(elements.systemicTrust, formatScore(state?.confidence?.systemicTrust));
+      setText(elements.treasuryControl, formatScore(state?.treasury?.controlScore));
+      setText(elements.fiatDisplacement, formatScore(state?.fiatDisplacement?.index));
+      setText(elements.marketRegime, formatLabel(state?.market?.regime?.name || state?.scenarios?.currentRegime || "calm_expansion"));
+
+      renderTable(elements.monoAuditTable, [
+        ["Policy Midpoint", formatUsd(state?.prices?.mono?.policyMidpoint, 4)],
+        ["Buy Point", formatUsd(state?.policy?.mono?.buyPoint, 4)],
+        ["Sell Point", formatUsd(state?.policy?.mono?.sellPoint, 4)],
+        ["Volatility", formatPercent(state?.market?.mono?.volatility)],
+        ["Market Depth", formatUsdCompact(state?.market?.mono?.marketDepthUsd)],
+        ["Desired Buy", formatUsdCompact(state?.market?.mono?.desiredBuyUsd)],
+        ["Unfilled Buy", formatUsdCompact(state?.market?.mono?.unfilledBuyDemandUsd)],
+        ["Unfilled Sell", formatCoins(state?.market?.mono?.unfilledSellPressureCoins)]
+      ]);
+
+      renderTable(elements.divAuditTable, [
+        ["Policy Midpoint", formatUsd(state?.prices?.div?.policyMidpoint, 4)],
+        ["Floor", formatUsd(state?.policy?.div?.floor, 4)],
+        ["Top Point", formatUsd(state?.policy?.div?.topPoint, 4)],
+        ["Volatility", formatPercent(state?.market?.div?.volatility)],
+        ["Market Depth", formatUsdCompact(state?.market?.div?.marketDepthUsd)],
+        ["Desired Buy", formatUsdCompact(state?.market?.div?.desiredBuyUsd)],
+        ["Unfilled Buy", formatUsdCompact(state?.market?.div?.unfilledBuyDemandUsd)],
+        ["Unfilled Sell", formatCoins(state?.market?.div?.unfilledSellPressureCoins)]
+      ]);
+
+      renderTable(elements.adoptionTable, [
+        ["Aware Users", formatWhole(state?.adoption?.mono?.awareUsers)],
+        ["Trial Users", formatWhole(state?.adoption?.mono?.trialUsers)],
+        ["Active Users", formatWhole(state?.adoption?.mono?.activeUsers)],
+        ["Sticky Users", formatWhole(state?.adoption?.mono?.stickyUsers)],
+        ["Merchants", formatWhole(state?.adoption?.mono?.merchants)],
+        ["Businesses", formatWhole(state?.adoption?.mono?.businesses)],
+        ["Institutions", formatWhole(state?.adoption?.mono?.institutions)],
+        ["Churn", formatWhole(state?.adoption?.flows?.churn)]
+      ]);
+
+      setText(elements.fiatStage, formatLabel(state?.fiatDisplacement?.stage || "fiat_dominant"));
+      setText(elements.fiatUsefulness, formatScore(state?.fiatDisplacement?.fiatUsefulnessScore));
+      setText(elements.governmentResistance, formatScore(state?.fiatDisplacement?.governmentResistanceLevel));
+      setText(elements.unitOfAccount, formatScore(state?.fiatDisplacement?.unitOfAccountAdoption));
+
+      setMeter(elements.fiatUsefulnessMeter, state?.fiatDisplacement?.fiatUsefulnessScore);
+      setMeter(elements.governmentResistanceMeter, state?.fiatDisplacement?.governmentResistanceLevel);
+      setMeter(elements.unitOfAccountMeter, state?.fiatDisplacement?.unitOfAccountAdoption);
+
+      renderMessages(elements.warningList, state?.warnings || [], "No warnings yet.");
+      renderMessages(elements.explanationList, state?.explanations?.latest || [], "Waiting for explanations.");
+      renderMessages(elements.scenarioList, state?.scenarios?.active || [], "No active scenarios.");
+    }
+
+    function renderTable(tableBody, rows) {
+      if (!tableBody) return;
+
+      tableBody.innerHTML = "";
+
+      for (const [label, value] of rows) {
+        const tr = document.createElement("tr");
+        const labelCell = document.createElement("td");
+        const valueCell = document.createElement("td");
+
+        labelCell.textContent = label;
+        valueCell.innerHTML = `<strong>${value}</strong>`;
+
+        tr.appendChild(labelCell);
+        tr.appendChild(valueCell);
+        tableBody.appendChild(tr);
+      }
+    }
+
+    function renderMessages(element, items, emptyText) {
+      if (!element) return;
+
+      const visible = Array.isArray(items) ? items.slice(-10).reverse() : [];
+
+      element.innerHTML = "";
+
+      if (visible.length === 0) {
+        const empty = document.createElement("p");
+        empty.className = "empty-state";
+        empty.textContent = emptyText;
+        element.appendChild(empty);
+        return;
+      }
+
+      for (const item of visible) {
+        const card = document.createElement("article");
+        card.className = `message-card message-card--${normaliseSeverity(item.severity)}`;
+
+        const meta = document.createElement("div");
+        meta.className = "message-card__meta";
+        meta.textContent = `${item.severity || "info"} · ${item.type || item.category || item.code || "system"}`;
+
+        const text = document.createElement("p");
+        text.textContent = item.message || item.explanation || item.name || "Economy event";
+
+        card.appendChild(meta);
+        card.appendChild(text);
+        element.appendChild(card);
+      }
+    }
+
+    function normaliseSeverity(severity) {
+      if (severity === "critical" || severity === "severe" || severity === "crisis") return "critical";
+      if (severity === "high" || severity === "serious") return "high";
+      if (severity === "medium" || severity === "moderate") return "medium";
+      return "info";
+    }
+
+    function setMeter(element, value) {
+      if (!element) return;
+      element.style.width = `${clamp(Number(value || 0), 0, 100)}%`;
+    }
+
+    function setText(element, value) {
+      if (element) element.textContent = value;
+    }
+
+    function average(values) {
+      const nums = values.map(Number).filter(Number.isFinite);
+      if (nums.length === 0) return 0;
+      return nums.reduce((a, b) => a + b, 0) / nums.length;
+    }
+
+    function formatUsd(value, decimals = 2) {
+      const number = Number(value || 0);
+      return `$${number.toLocaleString("en-US", {
+        minimumFractionDigits: decimals,
+        maximumFractionDigits: decimals
+      })}`;
+    }
+
+    function formatUsdCompact(value) {
+      const number = Number(value || 0);
+      const abs = Math.abs(number);
+
+      if (abs >= 1_000_000_000_000) return `$${(number / 1_000_000_000_000).toFixed(2)}T`;
+      if (abs >= 1_000_000_000) return `$${(number / 1_000_000_000).toFixed(2)}B`;
+      if (abs >= 1_000_000) return `$${(number / 1_000_000).toFixed(2)}M`;
+      if (abs >= 1_000) return `$${(number / 1_000).toFixed(2)}K`;
+
+      return `$${number.toFixed(2)}`;
+    }
+
+    function formatCoins(value) {
+      const number = Number(value || 0);
+      const abs = Math.abs(number);
+
+      if (abs >= 1_000_000_000_000) return `${(number / 1_000_000_000_000).toFixed(2)}T`;
+      if (abs >= 1_000_000_000) return `${(number / 1_000_000_000).toFixed(2)}B`;
+      if (abs >= 1_000_000) return `${(number / 1_000_000).toFixed(2)}M`;
+      if (abs >= 1_000) return `${(number / 1_000).toFixed(2)}K`;
+
+      return number.toFixed(2);
+    }
+
+    function formatWhole(value) {
+      return Math.round(Number(value || 0)).toLocaleString("en-US");
+    }
+
+    function formatScore(value) {
+      return `${Number(value || 0).toFixed(1)}/100`;
+    }
+
+    function formatPercent(value) {
+      return `${(Number(value || 0) * 100).toFixed(2)}%`;
+    }
+
+    function formatLabel(value) {
+      return String(value || "")
+        .replace(/_/g, " ")
+        .replace(/\b\w/g, (letter) => letter.toUpperCase());
+    }
+
+    function clamp(value, min, max) {
+      if (!Number.isFinite(value)) return min;
+      return Math.min(max, Math.max(min, value));
+    }
+  </script>
+</body>
+</html>
