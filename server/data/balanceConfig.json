@@ -1,0 +1,589 @@
+{
+  "version": "1.0.0",
+  "purpose": "Core balance, safety, and calibration settings for the Mono & DIV Economy Game.",
+  "principle": "The simulation should reward controlled monetary expansion, not reckless growth.",
+
+  "startingState": {
+    "treasuryFiatUsd": 1000000,
+    "treasuryMono": 100000000000000,
+    "treasuryDiv": 100000000000000,
+    "circulatingMono": 300000,
+    "circulatingDiv": 300000,
+    "monoMarketPrice": 1,
+    "divMarketPrice": 1
+  },
+
+  "strategicReserveTargets": {
+    "mono": 30000000000000,
+    "div": 30000000000000,
+    "principle": "The treasury should try to keep at least 30T Mono and 30T DIV. The player may go below this, but the economy should treat it as dangerous."
+  },
+
+  "inventoryZones": {
+    "excellent": {
+      "minBalance": 70000000000000,
+      "maxBalance": 100000000000000,
+      "controlScore": 100,
+      "trustPenalty": 0,
+      "volatilityMultiplier": 0.9,
+      "description": "Excellent treasury control."
+    },
+
+    "strong": {
+      "minBalance": 50000000000000,
+      "maxBalance": 70000000000000,
+      "controlScore": 85,
+      "trustPenalty": 0,
+      "volatilityMultiplier": 1,
+      "description": "Strong treasury control."
+    },
+
+    "weakening": {
+      "minBalance": 30000000000000,
+      "maxBalance": 50000000000000,
+      "controlScore": 65,
+      "trustPenalty": 5,
+      "volatilityMultiplier": 1.15,
+      "description": "Treasury control is weakening."
+    },
+
+    "danger": {
+      "minBalance": 10000000000000,
+      "maxBalance": 30000000000000,
+      "controlScore": 35,
+      "trustPenalty": 18,
+      "volatilityMultiplier": 1.45,
+      "description": "Danger zone. Treasury inventory is below the strategic reserve target."
+    },
+
+    "critical": {
+      "minBalance": 1,
+      "maxBalance": 10000000000000,
+      "controlScore": 10,
+      "trustPenalty": 35,
+      "volatilityMultiplier": 1.9,
+      "description": "Critical zone. Treasury has very little remaining sell-side control."
+    },
+
+    "lost_sell_side_control": {
+      "minBalance": 0,
+      "maxBalance": 0,
+      "controlScore": 0,
+      "trustPenalty": 55,
+      "volatilityMultiplier": 2.5,
+      "description": "The treasury has lost sell-side control for this asset."
+    }
+  },
+
+  "policyDefaults": {
+    "mono": {
+      "buyPoint": 0.99,
+      "sellPoint": 1.01,
+      "listedSupply": 1000000,
+      "buybackBudgetUsd": 0,
+      "autoBuybackEnabled": true,
+      "recommendedSpreadMin": 0.01,
+      "recommendedSpreadMax": 0.08
+    },
+
+    "div": {
+      "buyPoint": 0.99,
+      "sellPoint": 1.01,
+      "floor": 0.99,
+      "topPoint": 1.25,
+      "listedSupply": 1000000,
+      "buybackBudgetUsd": 0,
+      "autoBuybackEnabled": false,
+      "annualGrowthTarget": 0.1,
+      "recommendedSpreadMin": 0.015,
+      "recommendedSpreadMax": 0.15
+    },
+
+    "dividends": {
+      "enabled": true,
+      "automationEnabled": false,
+      "targetAnnualDivDistribution": 0,
+      "maxDistributionPerTick": 0,
+      "sustainabilityWarningThreshold": 45,
+      "sustainabilityDangerThreshold": 30
+    },
+
+    "treasury": {
+      "allocationMode": "balanced",
+      "preserveStrategicReserves": true,
+      "minMonoReserve": 30000000000000,
+      "minDivReserve": 30000000000000
+    }
+  },
+
+  "priceEngine": {
+    "mono": {
+      "baseVolatility": 0.012,
+      "minVolatility": 0.002,
+      "maxVolatility": 0.25,
+      "fundamentalPullSpeed": 0.025,
+      "orderFlowImpactCoefficient": 0.035,
+      "maxReturnPerTick": 0.08,
+      "momentumWeight": 0.015,
+      "marketDepthFloorUsd": 10000,
+      "targetStabilityPrice": 1,
+      "description": "Mono should behave more like a stability, payment, and reserve asset."
+    },
+
+    "div": {
+      "baseVolatility": 0.028,
+      "minVolatility": 0.005,
+      "maxVolatility": 0.6,
+      "fundamentalPullSpeed": 0.04,
+      "orderFlowImpactCoefficient": 0.075,
+      "maxReturnPerTick": 0.18,
+      "momentumWeightBase": 0.04,
+      "momentumWeightSpeculativeBonus": 0.04,
+      "marketDepthFloorUsd": 10000,
+      "overheatingWarningThreshold": 60,
+      "overheatingDangerThreshold": 80,
+      "description": "DIV should behave more like a growth, dividend-expectation, and speculative network asset."
+    },
+
+    "marketDepth": {
+      "circulationDepthShare": 0.08,
+      "treasuryListedSupplyDepthShare": 0.25,
+      "liquidFiatDepthShare": 0.01,
+      "lowLiquidityThreshold": 40,
+      "fragileLiquidityThreshold": 25
+    },
+
+    "volatility": {
+      "returnContribution": 0.45,
+      "scenarioContribution": 0.25,
+      "lowLiquidityContribution": 0.025,
+      "lowConfidenceContribution": 0.03,
+      "inventoryDangerContribution": 0.035
+    }
+  },
+
+  "demandAdoptionEngine": {
+    "population": {
+      "potentialUsers": 1000000000,
+      "startingAwareUsers": 10000,
+      "startingTrialUsers": 1000,
+      "startingActiveUsers": 300,
+      "startingStickyUsers": 100,
+      "startingMerchants": 10,
+      "startingBusinesses": 1,
+      "startingInstitutions": 0
+    },
+
+    "monoDemand": {
+      "activeUserTransactionalUsd": 18,
+      "stickyUserTransactionalUsd": 35,
+      "merchantTransactionalUsd": 300,
+      "businessTransactionalUsd": 4000,
+      "stickyUserSavingsUsd": 55,
+      "businessSavingsUsd": 8000,
+      "institutionSavingsUsd": 250000,
+      "institutionReserveUsd": 500000,
+      "baseSellPressureRate": 0.0005
+    },
+
+    "divDemand": {
+      "dividendSeekerDemandUsd": 35,
+      "stickyHolderGrowthDemandUsd": 25,
+      "speculatorDemandUsd": 50,
+      "institutionDemandUsd": 350000,
+      "baseSellPressureRate": 0.0008,
+      "startingSpeculativeDemandShare": 0.6
+    },
+
+    "adoptionQuality": {
+      "monoStickyShareWeight": 30,
+      "monoMerchantSupportWeight": 20,
+      "monoBusinessSupportWeight": 15,
+      "monoStabilityTrustWeight": 25,
+      "monoLiquidityTrustWeight": 10,
+      "divStickyShareWeight": 30,
+      "divDividendTrustWeight": 25,
+      "divSystemicTrustWeight": 15,
+      "divLiquidityTrustWeight": 10,
+      "divNonSpeculativeWeight": 15
+    },
+
+    "churn": {
+      "monoMinChurnRate": 0.001,
+      "monoMaxChurnRate": 0.25,
+      "divMinChurnRate": 0.002,
+      "divMaxChurnRate": 0.4
+    }
+  },
+
+  "treasuryExecutionEngine": {
+    "absorptionCapacity": {
+      "baseCapacityFloorUsd": 10000,
+      "confidenceWeight": 1,
+      "liquidityWeight": 1,
+      "adoptionQualityWeight": 1,
+      "inventoryHealthWeight": 1,
+      "regulatoryPenaltyWeight": 1,
+      "volatilityPenaltyWeight": 1
+    },
+
+    "supportCapacity": {
+      "monoMaxDeployableLiquidFiatSharePerTick": 0.04,
+      "divMaxDeployableLiquidFiatSharePerTick": 0.025,
+      "confidenceWeight": 1,
+      "liquidityWeight": 1,
+      "fiatTrustWeight": 1,
+      "supportScoreWeight": 1,
+      "panicPenaltyWeight": 1,
+      "volatilityPenaltyWeight": 1
+    },
+
+    "executionQualityWeights": {
+      "absorptionFillRate": 35,
+      "supportFillRate": 35,
+      "inventoryAverage": 20,
+      "systemicTrust": 10
+    },
+
+    "dividends": {
+      "daysPerYear": 365,
+      "monoDemandSpilloverMultiplier": 0.000001,
+      "expectationIncreasePerDistribution": 0.15,
+      "maxSafeAnnualTreasuryDivShare": 0.03,
+      "warningAnnualTreasuryDivShare": 0.06,
+      "dangerAnnualTreasuryDivShare": 0.1
+    }
+  },
+
+  "confidenceTrustEngine": {
+    "trustRegimes": {
+      "calm": {
+        "min": 80,
+        "max": 100,
+        "description": "High confidence. Demand quality and liquidity should improve."
+      },
+      "normal": {
+        "min": 60,
+        "max": 80,
+        "description": "Normal caution. The economy is functioning."
+      },
+      "fragile": {
+        "min": 40,
+        "max": 60,
+        "description": "Fragile confidence. Sell pressure and volatility should rise."
+      },
+      "run_risk": {
+        "min": 20,
+        "max": 40,
+        "description": "Run risk. Treasury execution becomes central."
+      },
+      "panic": {
+        "min": 0,
+        "max": 20,
+        "description": "Panic. Liquidity, trust, and price stability can break quickly."
+      }
+    },
+
+    "movementSpeeds": {
+      "preExecutionRise": 0.012,
+      "preExecutionFall": 0.04,
+      "postExecutionRise": 0.018,
+      "postExecutionFall": 0.075,
+      "maxRisePerTick": 0.12,
+      "maxFallPerTick": 0.35
+    },
+
+    "systemicTrustWeights": {
+      "normal": {
+        "monoStabilityTrust": 0.25,
+        "divDividendTrust": 0.15,
+        "treasuryInventoryTrust": 0.15,
+        "treasuryFiatTrust": 0.15,
+        "policyConsistencyTrust": 0.05,
+        "liquidityTrust": 0.1,
+        "adoptionTrust": 0.1,
+        "regulatorySurvivalTrust": 0.05
+      },
+      "crisis": {
+        "monoStabilityTrust": 0.25,
+        "divDividendTrust": 0.08,
+        "treasuryInventoryTrust": 0.22,
+        "treasuryFiatTrust": 0.18,
+        "policyConsistencyTrust": 0.08,
+        "liquidityTrust": 0.13,
+        "adoptionTrust": 0.03,
+        "regulatorySurvivalTrust": 0.03
+      },
+      "fiatDisplacementHigh": {
+        "monoStabilityTrust": 0.22,
+        "divDividendTrust": 0.12,
+        "treasuryInventoryTrust": 0.16,
+        "treasuryFiatTrust": 0.1,
+        "policyConsistencyTrust": 0.08,
+        "liquidityTrust": 0.12,
+        "adoptionTrust": 0.14,
+        "regulatorySurvivalTrust": 0.06
+      }
+    },
+
+    "riskThresholds": {
+      "elevatedRunRisk": 0.25,
+      "highRunRisk": 0.5,
+      "elevatedPanicRisk": 0.25,
+      "highPanicRisk": 0.5
+    }
+  },
+
+  "treasuryFiatAllocationEngine": {
+    "globalM2UsdReference": 120000000000000,
+    "globalGdpUsdReference": 110000000000000,
+    "defaultTreasuryFiatCapUsd": 100000000000000,
+
+    "rebalanceRates": {
+      "balanced": 0.008,
+      "safety_first": 0.012,
+      "yield_seeking": 0.01,
+      "liquidity_first": 0.015
+    },
+
+    "currencyWeightCaps": {
+      "USD": {
+        "balanced": 0.35,
+        "safety_first": 0.4,
+        "yield_seeking": 0.3,
+        "liquidity_first": 0.45
+      },
+      "tier1Default": 0.18,
+      "tier2Default": 0.08,
+      "restrictedDefault": 0.04,
+      "lowTrustDefault": 0.035,
+      "yieldSeekingDefault": 0.08,
+      "normalOtherDefault": 0.06
+    },
+
+    "warningThresholds": {
+      "lowLiquidSupportShare": 0.1,
+      "negativeRealReturn": -0.03,
+      "weakFiatUsefulnessScore": 40,
+      "currencySaturationLevel": 150,
+      "capitalControlPenalty": 30
+    },
+
+    "liquidShare": {
+      "liquidityWeight": 0.55,
+      "trustWeight": 0.25,
+      "usdBonus": 0.15,
+      "nonUsdBonus": 0.05,
+      "capitalControlPenaltyWeight": 0.35,
+      "maxSaturationPenalty": 0.6,
+      "minShare": 0.05,
+      "maxShare": 0.95
+    }
+  },
+
+  "scenarioShockEngine": {
+    "baseAnnualScenarioRates": {
+      "sandbox": {
+        "minor": 6,
+        "moderate": 2,
+        "serious": 0.25,
+        "severe": 0,
+        "crisis": 0
+      },
+      "normal": {
+        "minor": 18,
+        "moderate": 6,
+        "serious": 1.5,
+        "severe": 0.25,
+        "crisis": 0.075
+      },
+      "hard": {
+        "minor": 30,
+        "moderate": 10,
+        "serious": 4,
+        "severe": 1,
+        "crisis": 0.15
+      },
+      "brutal": {
+        "minor": 48,
+        "moderate": 18,
+        "serious": 8,
+        "severe": 3,
+        "crisis": 0.35
+      },
+      "historical_chaos": {
+        "minor": 72,
+        "moderate": 30,
+        "serious": 14,
+        "severe": 6,
+        "crisis": 1.25
+      }
+    },
+
+    "severityWeights": {
+      "minor": 1,
+      "moderate": 2,
+      "serious": 3,
+      "severe": 4,
+      "crisis": 5
+    },
+
+    "scenarioSettingMultipliers": {
+      "frequency": {
+        "low": 0.6,
+        "normal": 1,
+        "high": 1.5
+      },
+      "intensity": {
+        "low": 0.7,
+        "normal": 1,
+        "high": 1.35
+      }
+    },
+
+    "pressureCaps": {
+      "scenarioPressure": 5,
+      "aftershockPressure": 3,
+      "clusteringPressure": 3
+    }
+  },
+
+  "fiatDisplacementEngine": {
+    "indexWeights": {
+      "savingsAdoption": 0.25,
+      "paymentAdoption": 0.25,
+      "unitOfAccountAdoption": 0.2,
+      "businessSettlementAdoption": 0.1,
+      "reserveAdoption": 0.1,
+      "fiatUsefulnessWeakness": 0.1
+    },
+
+    "stages": {
+      "fiat_dominant": {
+        "min": 0,
+        "max": 10,
+        "label": "Fiat Dominant",
+        "description": "Fiat remains the clear monetary center."
+      },
+      "crypto_alternative": {
+        "min": 10,
+        "max": 25,
+        "label": "Crypto Alternative",
+        "description": "Mono and DIV are alternatives, not yet serious fiat competitors."
+      },
+      "parallel_monetary_system": {
+        "min": 25,
+        "max": 45,
+        "label": "Parallel Monetary System",
+        "description": "Mono and DIV are meaningful parallel options for some users."
+      },
+      "monetary_competition": {
+        "min": 45,
+        "max": 65,
+        "label": "Monetary Competition",
+        "description": "Mono and DIV seriously compete with fiat functions."
+      },
+      "strategically_weakened_fiat": {
+        "min": 65,
+        "max": 80,
+        "label": "Strategically Weakened Fiat",
+        "description": "Fiat remains important but is losing strategic dominance."
+      },
+      "fiat_displacement_regime": {
+        "min": 80,
+        "max": 90,
+        "label": "Fiat Displacement Regime",
+        "description": "Private markets increasingly prefer Mono and DIV functions."
+      },
+      "fiat_meaning_collapse": {
+        "min": 90,
+        "max": 100,
+        "label": "Fiat Meaning Collapse",
+        "description": "Fiat is no longer the primary private-market monetary reference."
+      }
+    },
+
+    "unitOfAccountGates": {
+      "below5": 0.55,
+      "below20": 0.65,
+      "below40": 0.78,
+      "below60": 0.9,
+      "above60": 1
+    },
+
+    "movementSpeeds": {
+      "paymentRise": 0.012,
+      "paymentFall": 0.025,
+      "savingsRise": 0.01,
+      "savingsFall": 0.022,
+      "settlementRise": 0.008,
+      "settlementFall": 0.02,
+      "reserveRise": 0.006,
+      "reserveFall": 0.018,
+      "unitOfAccountRise": 0.003,
+      "unitOfAccountFall": 0.015
+    },
+
+    "governmentResistance": {
+      "displacementWeight": 45,
+      "unitOfAccountWeight": 22,
+      "paymentWeight": 10,
+      "settlementWeight": 10,
+      "reserveWeight": 8,
+      "mediaAttentionWeight": 8,
+      "regulationPressureWeight": 20
+    }
+  },
+
+  "historyLimits": {
+    "scenarioHistory": 500,
+    "eventHistory": 500,
+    "explanationHistory": 200,
+    "chartPoints": 2000
+  },
+
+  "uiThresholds": {
+    "prices": {
+      "monoLargeMove": 0.04,
+      "monoMediumMove": 0.015,
+      "divLargeMove": 0.1,
+      "divMediumMove": 0.04
+    },
+
+    "warnings": {
+      "maxVisibleWarnings": 12,
+      "maxLatestExplanations": 14,
+      "criticalColorMeaning": "Immediate control risk",
+      "highColorMeaning": "Serious stress",
+      "mediumColorMeaning": "Important but not yet critical",
+      "infoColorMeaning": "Normal explanation"
+    },
+
+    "charts": {
+      "defaultVisiblePoints": 300,
+      "maxVisiblePoints": 2000
+    }
+  },
+
+  "testingTargets": {
+    "normalMode": {
+      "tenYearSurvivalShouldBePossible": true,
+      "recklessPolicyShouldEventuallyFail": true,
+      "monoShouldUsuallyBeLessVolatileThanDiv": true,
+      "highAdoptionShouldCreateBothGrowthAndStress": true,
+      "fiatDisplacementShouldRequireUnitOfAccountAdoption": true
+    },
+
+    "hardMode": {
+      "treasuryMistakesShouldCompound": true,
+      "lowInventoryShouldTriggerTrustStress": true,
+      "thinLiquidityShouldAmplifyPriceMoves": true
+    },
+
+    "brutalMode": {
+      "compoundShocksShouldBeCommon": true,
+      "panicRiskShouldMatter": true,
+      "successfulSurvivalShouldRequireConservativeTreasuryManagement": true
+    }
+  }
+}
