@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Mono & DIV Economy Game</title>
+
+  <link rel="stylesheet" href="/styles.css" />
+</head>
+
+<body>
+  <div class="app-shell">
+    <header class="topbar">
+      <div class="brand">
+        <div class="brand-mark">M/D</div>
+        <div>
+          <h1>Mono & DIV Economy Game</h1>
+          <p>Server-authoritative treasury economy simulator</p>
+        </div>
+      </div>
+
+      <div class="topbar-actions">
+        <div class="connection-pill" id="connectionStatus">
+          <span class="status-dot status-dot--offline"></span>
+          Connecting
+        </div>
+
+        <div class="more-menu" data-more-menu>
+          <button class="secondary-button" type="button" id="moreMenuButton" aria-expanded="false">
+            More
+          </button>
+
+          <nav class="more-menu-panel" id="moreMenuPanel" aria-label="More pages">
+            <a href="/economy" target="_blank" rel="noopener noreferrer">Economy Audit</a>
+            <a href="/treasury" target="_blank" rel="noopener noreferrer">Treasury</a>
+            <a href="/defaults" target="_blank" rel="noopener noreferrer">Defaults</a>
+          </nav>
+        </div>
+      </div>
+    </header>
+
+    <main class="dashboard">
+      <section class="hero-grid">
+        <article class="market-card market-card--mono">
+          <div class="card-heading">
+            <div>
+              <p class="eyebrow">Mono</p>
+              <h2 id="monoMarketPrice">$1.0000</h2>
+            </div>
+            <span class="asset-badge asset-badge--mono">Stability</span>
+          </div>
+
+          <div class="mini-stats">
+            <div>
+              <span>Policy Mid</span>
+              <strong id="monoPolicyMidpoint">$1.0000</strong>
+            </div>
+            <div>
+              <span>Buy Point</span>
+              <strong id="monoBuyPoint">$0.9900</strong>
+            </div>
+            <div>
+              <span>Sell Point</span>
+              <strong id="monoSellPoint">$1.0100</strong>
+            </div>
+            <div>
+              <span>Liquidity</span>
+              <strong id="monoLiquidity">75/100</strong>
+            </div>
+          </div>
+        </article>
+
+        <article class="market-card market-card--div">
+          <div class="card-heading">
+            <div>
+              <p class="eyebrow">DIV</p>
+              <h2 id="divMarketPrice">$1.0000</h2>
+            </div>
+            <span class="asset-badge asset-badge--div">Growth</span>
+          </div>
+
+          <div class="mini-stats">
+            <div>
+              <span>Policy Mid</span>
+              <strong id="divPolicyMidpoint">$1.0000</strong>
+            </div>
+            <div>
+              <span>Floor</span>
+              <strong id="divFloor">$0.9900</strong>
+            </div>
+            <div>
+              <span>Top Point</span>
+              <strong id="divTopPoint">$1.2500</strong>
+            </div>
+            <div>
+              <span>Overheating</span>
+              <strong id="divOverheating">0/100</strong>
+            </div>
+          </div>
+        </article>
+
+        <article class="market-card market-card--treasury">
+          <div class="card-heading">
+            <div>
+              <p class="eyebrow">Treasury</p>
+              <h2 id="treasuryFiat">$1.00M</h2>
+            </div>
+            <span class="asset-badge asset-badge--treasury">Control</span>
+          </div>
+
+          <div class="mini-stats">
+            <div>
+              <span>Real Fiat</span>
+              <strong id="treasuryRealFiat">$1.00M</strong>
+            </div>
+            <div>
+              <span>Control</span>
+              <strong id="treasuryControlScore">100/100</strong>
+            </div>
+            <div>
+              <span>Mono Reserve</span>
+              <strong id="treasuryMono">100.00T</strong>
+            </div>
+            <div>
+              <span>DIV Reserve</span>
+              <strong id="treasuryDiv">100.00T</strong>
+            </div>
+          </div>
+        </article>
+      </section>
+
+      <section class="chart-grid">
+        <article class="panel panel--large">
+          <div class="panel-header">
+            <div>
+              <p class="eyebrow">Price history</p>
+              <h3>Mono and DIV market prices</h3>
+            </div>
+            <span class="panel-note">Market price is not the policy midpoint</span>
+          </div>
+
+          <div class="chart-wrap">
+            <canvas id="priceChart" width="900" height="320"></canvas>
+          </div>
+        </article>
+
+        <article class="panel">
+          <div class="panel-header">
+            <div>
+              <p class="eyebrow">Confidence</p>
+              <h3>System trust</h3>
+            </div>
+          </div>
+
+          <div class="gauge">
+            <div class="gauge-value" id="systemicTrust">75</div>
+            <div class="gauge-label" id="trustRegime">Normal</div>
+          </div>
+
+          <div class="stacked-stats">
+            <div>
+              <span>Run Risk</span>
+              <strong id="runRisk">0.00%</strong>
+            </div>
+            <div>
+              <span>Panic Risk</span>
+              <strong id="panicRisk">0.00%</strong>
+            </div>
+            <div>
+              <span>Trend</span>
+              <strong id="trustTrend">Stable</strong>
+            </div>
+          </div>
+        </article>
+      </section>
+
+      <section class="content-grid">
+        <article class="panel">
+          <div class="panel-header">
+            <div>
+              <p class="eyebrow">Mono policy</p>
+              <h3>Stability desk</h3>
+            </div>
+          </div>
+
+          <form class="control-form" id="monoPolicyForm">
+            <label>
+              Buy Point
+              <input id="monoBuyInput" name="buyPoint" type="number" min="0" step="0.0001" value="0.99" />
+            </label>
+
+            <label>
+              Sell Point
+              <input id="monoSellInput" name="sellPoint" type="number" min="0" step="0.0001" value="1.01" />
+            </label>
+
+            <label>
+              Listed Supply
+              <input id="monoListedSupplyInput" name="listedSupply" type="number" min="0" step="1000" value="1000000" />
+            </label>
+
+            <label>
+              Buyback Budget
+              <input id="monoBuybackBudgetInput" name="buybackBudgetUsd" type="number" min="0" step="1000" value="0" />
+            </label>
+
+            <label class="checkbox-row">
+              <input id="monoAutoBuybackInput" name="autoBuybackEnabled" type="checkbox" checked />
+              Auto buyback
+            </label>
+
+            <button type="submit">Update Mono Policy</button>
+          </form>
+        </article>
+
+        <article class="panel">
+          <div class="panel-header">
+            <div>
+              <p class="eyebrow">DIV policy</p>
+              <h3>Growth desk</h3>
+            </div>
+          </div>
+
+          <form class="control-form" id="divPolicyForm">
+            <label>
+              Buy Point
+              <input id="divBuyInput" name="buyPoint" type="number" min="0" step="0.0001" value="0.99" />
+            </label>
+
+            <label>
+              Sell Point
+              <input id="divSellInput" name="sellPoint" type="number" min="0" step="0.0001" value="1.01" />
+            </label>
+
+            <label>
+              Floor
+              <input id="divFloorInput" name="floor" type="number" min="0" step="0.0001" value="0.99" />
+            </label>
+
+            <label>
+              Top Point
+              <input id="divTopPointInput" name="topPoint" type="number" min="0" step="0.0001" value="1.25" />
+            </label>
+
+            <label>
+              Listed Supply
+              <input id="divListedSupplyInput" name="listedSupply" type="number" min="0" step="1000" value="1000000" />
+            </label>
+
+            <label>
+              Annual Growth Target
+              <input id="divGrowthTargetInput" name="annualGrowthTarget" type="number" min="-0.99" max="10" step="0.01" value="0.1" />
+            </label>
+
+            <button type="submit">Update DIV Policy</button>
+          </form>
+        </article>
+
+        <article class="panel">
+          <div class="panel-header">
+            <div>
+              <p class="eyebrow">Dividends</p>
+              <h3>DIV distribution</h3>
+            </div>
+          </div>
+
+          <form class="control-form" id="dividendPolicyForm">
+            <label class="checkbox-row">
+              <input id="dividendsEnabledInput" name="enabled" type="checkbox" checked />
+              Dividends enabled
+            </label>
+
+            <label class="checkbox-row">
+              <input id="dividendAutomationInput" name="automationEnabled" type="checkbox" />
+              Automatic distribution
+            </label>
+
+            <label>
+              Target Annual DIV Distribution
+              <input id="targetAnnualDivDistributionInput" name="targetAnnualDivDistribution" type="number" min="0" step="1000" value="0" />
+            </label>
+
+            <label>
+              Max Distribution Per Tick
+              <input id="maxDistributionPerTickInput" name="maxDistributionPerTick" type="number" min="0" step="1000" value="0" />
+            </label>
+
+            <button type="submit">Update Dividends</button>
+          </form>
+
+          <div class="stacked-stats stacked-stats--spaced">
+            <div>
+              <span>Expectation</span>
+              <strong id="dividendExpectation">25/100</strong>
+            </div>
+            <div>
+              <span>Sustainability</span>
+              <strong id="dividendSustainability">100/100</strong>
+            </div>
+          </div>
+        </article>
+
+        <article class="panel">
+          <div class="panel-header">
+            <div>
+              <p class="eyebrow">Economy</p>
+              <h3>Live state</h3>
+            </div>
+          </div>
+
+          <div class="stacked-stats">
+            <div>
+              <span>Circulating Mono</span>
+              <strong id="circulatingMono">300.00K</strong>
+            </div>
+            <div>
+              <span>Circulating DIV</span>
+              <strong id="circulatingDiv">300.00K</strong>
+            </div>
+            <div>
+              <span>Mono Adoption Quality</span>
+              <strong id="monoAdoptionQuality">50/100</strong>
+            </div>
+            <div>
+              <span>DIV Adoption Quality</span>
+              <strong id="divAdoptionQuality">40/100</strong>
+            </div>
+            <div>
+              <span>Fiat Displacement</span>
+              <strong id="fiatDisplacement">0/100</strong>
+            </div>
+            <div>
+              <span>Stage</span>
+              <strong id="fiatStage">Fiat dominant</strong>
+            </div>
+          </div>
+        </article>
+      </section>
+
+      <section class="bottom-grid">
+        <article class="panel">
+          <div class="panel-header">
+            <div>
+              <p class="eyebrow">Warnings</p>
+              <h3>Risk monitor</h3>
+            </div>
+          </div>
+
+          <div class="message-list" id="warningList">
+            <p class="empty-state">No warnings yet.</p>
+          </div>
+        </article>
+
+        <article class="panel">
+          <div class="panel-header">
+            <div>
+              <p class="eyebrow">Explanations</p>
+              <h3>Why the economy moved</h3>
+            </div>
+          </div>
+
+          <div class="message-list" id="explanationList">
+            <p class="empty-state">Waiting for server explanations.</p>
+          </div>
+        </article>
+
+        <article class="panel">
+          <div class="panel-header">
+            <div>
+              <p class="eyebrow">Scenarios</p>
+              <h3>Active shocks</h3>
+            </div>
+          </div>
+
+          <div class="message-list" id="scenarioList">
+            <p class="empty-state">No active scenarios.</p>
+          </div>
+        </article>
+      </section>
+    </main>
+  </div>
+
+  <script src="/charts.js"></script>
+  <script src="/client.js"></script>
+</body>
+</html>
