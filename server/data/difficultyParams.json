@@ -1,0 +1,226 @@
+{
+  "version": "1.0.0",
+  "purpose": "Difficulty settings for the Mono & DIV Economy Game. Difficulty changes stress conditions, not the core economic laws.",
+  "defaultDifficulty": "normal",
+  "difficulties": {
+    "sandbox": {
+      "label": "Sandbox",
+      "description": "Testing and learning mode. Low stress, forgiving recovery, and limited scenario clustering.",
+      "scenarioFrequencyMultiplier": 0.35,
+      "scenarioIntensityMultiplier": 0.4,
+      "volatilityMultiplier": 0.5,
+      "arbitrageAggression": 0.25,
+      "panicMultiplier": 0.25,
+      "trustRecoveryMultiplier": 1.6,
+      "regulatoryPressureMultiplier": 0.25,
+      "liquidityFragilityMultiplier": 0.5,
+      "supportStressMultiplier": 0.45,
+      "recoveryForgiveness": 1.6,
+      "endogenousShockSensitivity": 0.45,
+      "scenarioClusteringMultiplier": 0.35,
+      "annualScenarioTargets": {
+        "minor": {
+          "min": 4,
+          "max": 8
+        },
+        "moderate": {
+          "min": 1,
+          "max": 3
+        },
+        "serious": {
+          "min": 0,
+          "max": 1
+        },
+        "severe": {
+          "min": 0,
+          "max": 0
+        },
+        "crisis": {
+          "min": 0,
+          "max": 0
+        }
+      },
+      "notes": [
+        "Severe scenarios are normally disabled.",
+        "Crisis scenarios should only happen manually.",
+        "Best used for UI testing, engine debugging, and learning the economy."
+      ]
+    },
+
+    "normal": {
+      "label": "Normal",
+      "description": "Default realistic mode. The economy is plausible, mistakes matter, and crises are uncommon but possible.",
+      "scenarioFrequencyMultiplier": 1,
+      "scenarioIntensityMultiplier": 1,
+      "volatilityMultiplier": 1,
+      "arbitrageAggression": 1,
+      "panicMultiplier": 1,
+      "trustRecoveryMultiplier": 1,
+      "regulatoryPressureMultiplier": 1,
+      "liquidityFragilityMultiplier": 1,
+      "supportStressMultiplier": 1,
+      "recoveryForgiveness": 1,
+      "endogenousShockSensitivity": 1,
+      "scenarioClusteringMultiplier": 1,
+      "annualScenarioTargets": {
+        "minor": {
+          "min": 12,
+          "max": 24
+        },
+        "moderate": {
+          "min": 4,
+          "max": 8
+        },
+        "serious": {
+          "min": 1,
+          "max": 2
+        },
+        "severe": {
+          "min": 0,
+          "max": 1
+        },
+        "crisis": {
+          "min": 0,
+          "max": 0.1
+        }
+      },
+      "notes": [
+        "This is the recommended default difficulty.",
+        "Severe events should feel rare.",
+        "A crisis should generally appear only once every 10 to 20 simulated years."
+      ]
+    },
+
+    "hard": {
+      "label": "Hard",
+      "description": "A realistic but more punishing market. More arbitrage, more volatility, and slower trust recovery.",
+      "scenarioFrequencyMultiplier": 1.75,
+      "scenarioIntensityMultiplier": 1.35,
+      "volatilityMultiplier": 1.35,
+      "arbitrageAggression": 1.5,
+      "panicMultiplier": 1.4,
+      "trustRecoveryMultiplier": 0.8,
+      "regulatoryPressureMultiplier": 1.4,
+      "liquidityFragilityMultiplier": 1.35,
+      "supportStressMultiplier": 1.35,
+      "recoveryForgiveness": 0.8,
+      "endogenousShockSensitivity": 1.35,
+      "scenarioClusteringMultiplier": 1.35,
+      "annualScenarioTargets": {
+        "minor": {
+          "min": 24,
+          "max": 36
+        },
+        "moderate": {
+          "min": 8,
+          "max": 12
+        },
+        "serious": {
+          "min": 3,
+          "max": 5
+        },
+        "severe": {
+          "min": 1,
+          "max": 1
+        },
+        "crisis": {
+          "min": 0,
+          "max": 0.2
+        }
+      },
+      "notes": [
+        "Player mistakes compound faster.",
+        "Liquidity and trust are harder to rebuild.",
+        "A crisis should generally appear once every 5 to 10 simulated years."
+      ]
+    },
+
+    "brutal": {
+      "label": "Brutal",
+      "description": "Adversarial stress-test mode. Frequent compound shocks, aggressive arbitrage, and high regulatory pressure.",
+      "scenarioFrequencyMultiplier": 2.75,
+      "scenarioIntensityMultiplier": 1.85,
+      "volatilityMultiplier": 1.8,
+      "arbitrageAggression": 2.2,
+      "panicMultiplier": 2,
+      "trustRecoveryMultiplier": 0.6,
+      "regulatoryPressureMultiplier": 2,
+      "liquidityFragilityMultiplier": 1.9,
+      "supportStressMultiplier": 1.9,
+      "recoveryForgiveness": 0.55,
+      "endogenousShockSensitivity": 1.9,
+      "scenarioClusteringMultiplier": 2,
+      "annualScenarioTargets": {
+        "minor": {
+          "min": 36,
+          "max": 60
+        },
+        "moderate": {
+          "min": 12,
+          "max": 24
+        },
+        "serious": {
+          "min": 6,
+          "max": 10
+        },
+        "severe": {
+          "min": 2,
+          "max": 4
+        },
+        "crisis": {
+          "min": 0.25,
+          "max": 0.5
+        }
+      },
+      "notes": [
+        "Designed for stress testing, not normal play.",
+        "Compound shocks should be common.",
+        "A crisis should generally appear once every 2 to 4 simulated years."
+      ]
+    },
+
+    "historical_chaos": {
+      "label": "Historical Chaos",
+      "description": "Crisis-laboratory mode. Multiple historical-style crisis patterns can overlap.",
+      "scenarioFrequencyMultiplier": 4,
+      "scenarioIntensityMultiplier": 2.5,
+      "volatilityMultiplier": 2.5,
+      "arbitrageAggression": 3,
+      "panicMultiplier": 3,
+      "trustRecoveryMultiplier": 0.4,
+      "regulatoryPressureMultiplier": 3,
+      "liquidityFragilityMultiplier": 2.8,
+      "supportStressMultiplier": 2.8,
+      "recoveryForgiveness": 0.35,
+      "endogenousShockSensitivity": 2.8,
+      "scenarioClusteringMultiplier": 3,
+      "annualScenarioTargets": {
+        "minor": {
+          "min": 60,
+          "max": 90
+        },
+        "moderate": {
+          "min": 24,
+          "max": 40
+        },
+        "serious": {
+          "min": 10,
+          "max": 18
+        },
+        "severe": {
+          "min": 4,
+          "max": 8
+        },
+        "crisis": {
+          "min": 1,
+          "max": 2
+        }
+      },
+      "notes": [
+        "This mode is not meant to represent an average world.",
+        "It is a crisis lab for testing whether the economy breaks.",
+        "Recovery should be slow and scenario overlap should be common."
+      ]
+    }
+  }
+}
