@@ -1,5 +1,64 @@
 # Mono & DIV Economy Game
 
+A server-authoritative economic simulation game for a fictional two-asset monetary system:
+
+- **Mono**: stability, payment, reserve, and unit-of-account asset.
+- **DIV**: growth, dividend-expectation, and speculative network asset.
+
+The player controls treasury policy. The server controls reality.
+
+This is a simulation/game, not financial advice and not a real crypto project.
+
+---
+
+## Core idea
+
+The game starts with:
+
+- 100 trillion Mono in the treasury
+- 100 trillion DIV in the treasury
+- 300,000 circulating Mono
+- 300,000 circulating DIV
+- $1,000,000 fiat in the treasury
+
+The player sets:
+
+- Mono buy point
+- Mono sell point
+- Mono listed supply
+- DIV buy point
+- DIV sell point
+- DIV floor
+- DIV top point
+- DIV growth target
+- DIV dividend policy
+- Treasury fiat allocation mode
+- Difficulty and adoption settings
+
+The economy responds through:
+
+- market demand
+- sell pressure
+- treasury execution
+- trust
+- scenarios and shocks
+- fiat reserve usefulness
+- fiat displacement
+- adoption quality
+- liquidity
+- volatility
+
+---
+
+## Install
+
+```bash
+npm install
+
+-----------
+
+# Mono & DIV Economy Game
+
 A server-authoritative crypto-domination economic simulation built around Mono and DIV.
 
 Mono is designed as the system's stability, payment, and reserve asset. DIV is designed as the system's growth, dividend-expectation, and speculative network asset.
