@@ -1,0 +1,683 @@
+{
+  "version": "1.0.0",
+  "purpose": "Scenario family definitions for the Mono & DIV Economy Game.",
+  "principle": "Scenario families group shocks by the economic channels they affect. Individual scenarios should inherit family defaults and then override specific effects.",
+
+  "severityLevels": {
+    "minor": {
+      "label": "Minor",
+      "description": "Small event. Should create movement but not dominate the economy.",
+      "severityWeight": 1,
+      "defaultDurationDays": {
+        "min": 2,
+        "max": 14
+      },
+      "defaultIntensityMultiplier": 0.6
+    },
+
+    "moderate": {
+      "label": "Moderate",
+      "description": "Meaningful event. Should affect several engines and be visible to the player.",
+      "severityWeight": 2,
+      "defaultDurationDays": {
+        "min": 7,
+        "max": 45
+      },
+      "defaultIntensityMultiplier": 1
+    },
+
+    "serious": {
+      "label": "Serious",
+      "description": "Strong event. Should test liquidity, trust, treasury execution, or adoption quality.",
+      "severityWeight": 3,
+      "defaultDurationDays": {
+        "min": 14,
+        "max": 90
+      },
+      "defaultIntensityMultiplier": 1.5
+    },
+
+    "severe": {
+      "label": "Severe",
+      "description": "Major stress event. Should create visible instability and expose weak treasury design.",
+      "severityWeight": 4,
+      "defaultDurationDays": {
+        "min": 30,
+        "max": 180
+      },
+      "defaultIntensityMultiplier": 2.2
+    },
+
+    "crisis": {
+      "label": "Crisis",
+      "description": "Systemic stress event. Should be rare outside brutal or historical chaos settings.",
+      "severityWeight": 5,
+      "defaultDurationDays": {
+        "min": 60,
+        "max": 365
+      },
+      "defaultIntensityMultiplier": 3
+    }
+  },
+
+  "durationTypes": {
+    "flash": {
+      "label": "Flash",
+      "description": "Very short event with sharp immediate effects.",
+      "durationDays": {
+        "min": 1,
+        "max": 5
+      },
+      "recoveryShape": "fast_decay"
+    },
+
+    "short": {
+      "label": "Short",
+      "description": "Short market event or media cycle.",
+      "durationDays": {
+        "min": 5,
+        "max": 21
+      },
+      "recoveryShape": "normal_decay"
+    },
+
+    "medium": {
+      "label": "Medium",
+      "description": "Multi-week event that can influence adoption and trust.",
+      "durationDays": {
+        "min": 21,
+        "max": 90
+      },
+      "recoveryShape": "slow_decay"
+    },
+
+    "macro_regime": {
+      "label": "Macro Regime",
+      "description": "Longer economic regime that changes background conditions.",
+      "durationDays": {
+        "min": 90,
+        "max": 365
+      },
+      "recoveryShape": "regime_persistence"
+    },
+
+    "structural_transition": {
+      "label": "Structural Transition",
+      "description": "Long transition that affects fiat usefulness, regulation, adoption, or monetary structure.",
+      "durationDays": {
+        "min": 180,
+        "max": 1095
+      },
+      "recoveryShape": "partial_recovery"
+    }
+  },
+
+  "families": {
+    "promotion_attention": {
+      "id": "promotion_attention",
+      "label": "Promotion and Attention",
+      "description": "Media attention, creator mentions, viral trends, hype cycles, and public awareness events.",
+      "mainEnginesAffected": [
+        "demandAdoptionEngine",
+        "priceMarketEngine",
+        "confidenceTrustEngine",
+        "scenarioShockEngine"
+      ],
+      "commonSource": "exogenous",
+      "defaultDurationType": "short",
+      "defaultEffects": {
+        "awarenessImpact": 0.8,
+        "monoDemandImpact": 5,
+        "divDemandImpact": 8,
+        "volatilityImpact": 5,
+        "mediaAttentionImpact": 0.08,
+        "cryptoSentimentImpact": 0.04,
+        "adoptionQualityImpact": -1
+      },
+      "positiveChannels": [
+        "More awareness",
+        "More public demand",
+        "Faster trial adoption",
+        "Potential liquidity increase"
+      ],
+      "negativeChannels": [
+        "Lower adoption quality if attention is speculative",
+        "DIV overheating risk",
+        "Volatility from hype",
+        "Regulatory attention if promotion becomes large"
+      ],
+      "difficultyBias": {
+        "sandbox": 1,
+        "normal": 1,
+        "hard": 1.15,
+        "brutal": 1.3,
+        "historical_chaos": 1.5
+      },
+      "exampleScenarios": [
+        "Viral promotion wave",
+        "Major creator endorsement",
+        "Media backlash",
+        "Search interest spike",
+        "Influencer misinformation cycle"
+      ]
+    },
+
+    "adoption": {
+      "id": "adoption",
+      "label": "Adoption",
+      "description": "Events that affect real users, merchants, businesses, institutions, payment usage, and sticky economic use.",
+      "mainEnginesAffected": [
+        "demandAdoptionEngine",
+        "fiatDisplacementEngine",
+        "confidenceTrustEngine",
+        "priceMarketEngine"
+      ],
+      "commonSource": "mixed",
+      "defaultDurationType": "medium",
+      "defaultEffects": {
+        "monoDemandImpact": 8,
+        "merchantAdoptionImpact": 3,
+        "businessAdoptionImpact": 1,
+        "stickyAdoptionImpact": 2,
+        "adoptionTrustImpact": 4,
+        "paymentAdoptionImpact": 2,
+        "volatilityImpact": -1
+      },
+      "positiveChannels": [
+        "Higher active users",
+        "Higher sticky users",
+        "Better merchant coverage",
+        "Better payment utility",
+        "Better fiat displacement quality"
+      ],
+      "negativeChannels": [
+        "Adoption can outrun liquidity",
+        "Merchant coverage can lag user demand",
+        "High growth can create support stress",
+        "Bad integrations can increase churn"
+      ],
+      "difficultyBias": {
+        "sandbox": 0.8,
+        "normal": 1,
+        "hard": 1.1,
+        "brutal": 1.25,
+        "historical_chaos": 1.4
+      },
+      "exampleScenarios": [
+        "Payment adoption breakthrough",
+        "Merchant integration delay",
+        "Business settlement pilot",
+        "Institutional trial program",
+        "User churn wave"
+      ]
+    },
+
+    "dividend": {
+      "id": "dividend",
+      "label": "DIV and Dividend Expectations",
+      "description": "Events that affect DIV demand, dividend credibility, dividend expectations, and speculative dividend cycles.",
+      "mainEnginesAffected": [
+        "treasuryExecutionEngine",
+        "priceMarketEngine",
+        "confidenceTrustEngine",
+        "demandAdoptionEngine"
+      ],
+      "commonSource": "mixed",
+      "defaultDurationType": "short",
+      "defaultEffects": {
+        "divDemandImpact": 12,
+        "monoDemandImpact": 3,
+        "divTrustImpact": 2,
+        "volatilityImpact": 8,
+        "adoptionQualityImpact": -2
+      },
+      "positiveChannels": [
+        "More DIV demand",
+        "More dividend seekers",
+        "Potential Mono demand through dividend-linked utility",
+        "Higher growth narrative"
+      ],
+      "negativeChannels": [
+        "Unsustainable dividend expectations",
+        "DIV overheating",
+        "Treasury DIV inventory depletion",
+        "Speculative churn",
+        "Dividend trust collapse"
+      ],
+      "difficultyBias": {
+        "sandbox": 0.8,
+        "normal": 1,
+        "hard": 1.25,
+        "brutal": 1.6,
+        "historical_chaos": 2
+      },
+      "exampleScenarios": [
+        "DIV dividend hype cycle",
+        "Dividend sustainability skepticism",
+        "Missed dividend expectation",
+        "Dividend credibility rally",
+        "Speculative dividend bubble"
+      ]
+    },
+
+    "treasury_trust": {
+      "id": "treasury_trust",
+      "label": "Treasury Trust",
+      "description": "Events that test treasury credibility, coin inventory, buyback ability, sell-side control, and policy consistency.",
+      "mainEnginesAffected": [
+        "treasuryExecutionEngine",
+        "confidenceTrustEngine",
+        "priceMarketEngine",
+        "invariantEngine"
+      ],
+      "commonSource": "mostly_endogenous",
+      "defaultDurationType": "medium",
+      "defaultEffects": {
+        "inventoryTrustImpact": -8,
+        "policyTrustImpact": -6,
+        "liquidityTrustImpact": -5,
+        "monoSellPressureImpact": 8,
+        "divSellPressureImpact": 10,
+        "volatilityImpact": 10,
+        "runRiskImpact": 4
+      },
+      "positiveChannels": [
+        "Successful stress tests can improve trust later",
+        "Good reserves can prove credibility",
+        "Strong execution can attract high-quality adoption"
+      ],
+      "negativeChannels": [
+        "Inventory below strategic reserve",
+        "Failed support at buy point",
+        "Too-tight spreads",
+        "Arbitrage vulnerability",
+        "Visible inability to execute treasury policy"
+      ],
+      "difficultyBias": {
+        "sandbox": 0.5,
+        "normal": 1,
+        "hard": 1.45,
+        "brutal": 2,
+        "historical_chaos": 2.5
+      },
+      "exampleScenarios": [
+        "Mono inventory stress",
+        "DIV inventory stress",
+        "Mono support test",
+        "Treasury credibility rally",
+        "Failed support event"
+      ]
+    },
+
+    "market_structure": {
+      "id": "market_structure",
+      "label": "Market Structure and Liquidity",
+      "description": "Liquidity provider changes, exchange outages, whale flows, arbitrage pressure, volatility clustering, and market-depth shocks.",
+      "mainEnginesAffected": [
+        "priceMarketEngine",
+        "treasuryExecutionEngine",
+        "confidenceTrustEngine",
+        "scenarioShockEngine"
+      ],
+      "commonSource": "mixed",
+      "defaultDurationType": "short",
+      "defaultEffects": {
+        "liquidityImpact": -5,
+        "liquidityTrustImpact": -5,
+        "volatilityImpact": 10,
+        "monoSellPressureImpact": 4,
+        "divSellPressureImpact": 8,
+        "panicRiskImpact": 2
+      },
+      "positiveChannels": [
+        "Liquidity providers can improve depth",
+        "Better exchange access can reduce volatility",
+        "Strong depth improves trust"
+      ],
+      "negativeChannels": [
+        "Thin markets exaggerate price moves",
+        "Exchange outages create unfilled pressure",
+        "Whale selling tests support",
+        "Arbitrage attacks exploit weak policy spreads"
+      ],
+      "difficultyBias": {
+        "sandbox": 0.6,
+        "normal": 1,
+        "hard": 1.35,
+        "brutal": 1.8,
+        "historical_chaos": 2.3
+      },
+      "exampleScenarios": [
+        "Liquidity provider arrival",
+        "Whale sell event",
+        "Exchange outage",
+        "Arbitrage attack",
+        "Market depth collapse"
+      ]
+    },
+
+    "macro": {
+      "id": "macro",
+      "label": "Macro Growth and Risk Mood",
+      "description": "General economic conditions, risk-on/risk-off shifts, recession fear, credit expansion, and growth slowdowns.",
+      "mainEnginesAffected": [
+        "scenarioShockEngine",
+        "demandAdoptionEngine",
+        "priceMarketEngine",
+        "confidenceTrustEngine"
+      ],
+      "commonSource": "exogenous",
+      "defaultDurationType": "macro_regime",
+      "defaultEffects": {
+        "recessionRiskImpact": 0.08,
+        "cryptoSentimentImpact": -0.04,
+        "monoDemandImpact": 2,
+        "divDemandImpact": -6,
+        "divSellPressureImpact": 8,
+        "liquidityImpact": -4,
+        "volatilityImpact": 8
+      },
+      "positiveChannels": [
+        "Risk-on environments support DIV demand",
+        "Macro weakness can support Mono if trust is strong",
+        "Growth environments improve adoption"
+      ],
+      "negativeChannels": [
+        "Risk-off markets hurt DIV",
+        "Recession fear increases sell pressure",
+        "Liquidity becomes fragile",
+        "Trust recovers more slowly"
+      ],
+      "difficultyBias": {
+        "sandbox": 0.5,
+        "normal": 1,
+        "hard": 1.25,
+        "brutal": 1.6,
+        "historical_chaos": 2.4
+      },
+      "exampleScenarios": [
+        "Risk-on macro environment",
+        "Recession fear",
+        "Credit tightening",
+        "Growth boom",
+        "Global slowdown"
+      ]
+    },
+
+    "fiat_inflation": {
+      "id": "fiat_inflation",
+      "label": "Fiat and Inflation",
+      "description": "Fiat purchasing power, interest rates, currency weakness, FX decay, reserve usefulness, and fiat displacement pressure.",
+      "mainEnginesAffected": [
+        "treasuryFiatAllocationEngine",
+        "fiatDisplacementEngine",
+        "demandAdoptionEngine",
+        "confidenceTrustEngine"
+      ],
+      "commonSource": "exogenous",
+      "defaultDurationType": "macro_regime",
+      "defaultEffects": {
+        "fiatUsefulnessImpact": -6,
+        "realFiatImpact": -4,
+        "fxDecayImpact": 0.002,
+        "inflationFearImpact": 0.08,
+        "monoDemandImpact": 6,
+        "savingsAdoptionImpact": 2,
+        "volatilityImpact": 4
+      },
+      "positiveChannels": [
+        "Fiat weakness can increase Mono savings demand",
+        "Inflation fear can accelerate fiat displacement",
+        "High nominal yields can increase treasury fiat income"
+      ],
+      "negativeChannels": [
+        "Real fiat value can fall",
+        "FX decay can damage reserve quality",
+        "Fiat support becomes less reliable",
+        "Government resistance can rise"
+      ],
+      "difficultyBias": {
+        "sandbox": 0.6,
+        "normal": 1,
+        "hard": 1.3,
+        "brutal": 1.7,
+        "historical_chaos": 2.2
+      },
+      "exampleScenarios": [
+        "Inflation spike",
+        "Currency devaluation scare",
+        "High-yield currency trap",
+        "Real fiat return collapse",
+        "Fiat usefulness decline"
+      ]
+    },
+
+    "regulation_political": {
+      "id": "regulation_political",
+      "label": "Regulation and Political Pressure",
+      "description": "Regulatory warnings, banking restrictions, government resistance, tax pressure, legal uncertainty, and capital controls.",
+      "mainEnginesAffected": [
+        "confidenceTrustEngine",
+        "fiatDisplacementEngine",
+        "treasuryFiatAllocationEngine",
+        "demandAdoptionEngine"
+      ],
+      "commonSource": "mixed",
+      "defaultDurationType": "medium",
+      "defaultEffects": {
+        "regulatoryPressureImpact": 10,
+        "regulatoryTrustImpact": -8,
+        "liquidityTrustImpact": -5,
+        "monoDemandImpact": -5,
+        "divDemandImpact": -10,
+        "monoSellPressureImpact": 5,
+        "divSellPressureImpact": 10,
+        "bankingFrictionImpact": 4,
+        "volatilityImpact": 10
+      },
+      "positiveChannels": [
+        "Surviving regulation can eventually improve trust",
+        "Clear rules can reduce uncertainty after the shock passes"
+      ],
+      "negativeChannels": [
+        "Lower demand",
+        "Higher sell pressure",
+        "Banking friction",
+        "Lower regulatory survival trust",
+        "Higher government resistance"
+      ],
+      "difficultyBias": {
+        "sandbox": 0.4,
+        "normal": 1,
+        "hard": 1.5,
+        "brutal": 2.2,
+        "historical_chaos": 3
+      },
+      "exampleScenarios": [
+        "Regulatory warning",
+        "Banking access restriction",
+        "Capital control pressure",
+        "Tax reporting shock",
+        "Government resistance escalation"
+      ]
+    },
+
+    "banking_financial": {
+      "id": "banking_financial",
+      "label": "Banking and Financial System",
+      "description": "Banking stress, credit crises, exchange settlement problems, reserve access issues, and financial system instability.",
+      "mainEnginesAffected": [
+        "treasuryFiatAllocationEngine",
+        "fiatDisplacementEngine",
+        "confidenceTrustEngine",
+        "priceMarketEngine"
+      ],
+      "commonSource": "exogenous",
+      "defaultDurationType": "macro_regime",
+      "defaultEffects": {
+        "bankingStressImpact": 12,
+        "fiatUsefulnessImpact": -8,
+        "monoDemandImpact": 10,
+        "divDemandImpact": -4,
+        "liquidityImpact": -8,
+        "liquidityTrustImpact": -6,
+        "volatilityImpact": 12
+      },
+      "positiveChannels": [
+        "Banking stress can increase demand for Mono",
+        "Strong treasury reserves can prove credibility",
+        "Fiat displacement can accelerate if Mono remains stable"
+      ],
+      "negativeChannels": [
+        "Fiat liquidity can become harder to deploy",
+        "Market liquidity can freeze",
+        "Panic risk can rise",
+        "Treasury support capacity can fall even if nominal fiat is high"
+      ],
+      "difficultyBias": {
+        "sandbox": 0.5,
+        "normal": 1,
+        "hard": 1.35,
+        "brutal": 1.9,
+        "historical_chaos": 2.6
+      },
+      "exampleScenarios": [
+        "Banking stress",
+        "Settlement delay",
+        "Credit market shock",
+        "Reserve access disruption",
+        "Bank run contagion"
+      ]
+    },
+
+    "competition_technology": {
+      "id": "competition_technology",
+      "label": "Competition and Technology",
+      "description": "Competitor launches, protocol upgrades, security improvements, reliability problems, and technology perception shifts.",
+      "mainEnginesAffected": [
+        "demandAdoptionEngine",
+        "confidenceTrustEngine",
+        "priceMarketEngine",
+        "fiatDisplacementEngine"
+      ],
+      "commonSource": "mixed",
+      "defaultDurationType": "medium",
+      "defaultEffects": {
+        "monoDemandImpact": 2,
+        "divDemandImpact": 2,
+        "adoptionTrustImpact": 2,
+        "liquidityTrustImpact": 1,
+        "businessAdoptionImpact": 1,
+        "volatilityImpact": 2
+      },
+      "positiveChannels": [
+        "Successful upgrades improve trust",
+        "Better reliability improves adoption quality",
+        "Technology improvements can reduce churn",
+        "Institutional adoption can become easier"
+      ],
+      "negativeChannels": [
+        "Competitors can steal attention",
+        "Technical failures can damage trust",
+        "Reliability issues can increase churn",
+        "Security scares can create sell pressure"
+      ],
+      "difficultyBias": {
+        "sandbox": 0.8,
+        "normal": 1,
+        "hard": 1.15,
+        "brutal": 1.35,
+        "historical_chaos": 1.6
+      },
+      "exampleScenarios": [
+        "Technology upgrade success",
+        "Strong competitor launch",
+        "Reliability issue",
+        "Security scare",
+        "Developer ecosystem growth"
+      ]
+    }
+  },
+
+  "familyInteractionRules": {
+    "promotion_attention + market_structure": {
+      "description": "Hype with weak liquidity creates volatility and bubble risk.",
+      "effects": {
+        "volatilityImpact": 8,
+        "divSellPressureImpact": 4,
+        "adoptionQualityImpact": -3
+      }
+    },
+
+    "promotion_attention + dividend": {
+      "description": "Attention plus dividend expectations can create DIV overheating.",
+      "effects": {
+        "divDemandImpact": 12,
+        "volatilityImpact": 8,
+        "divTrustImpact": -2
+      }
+    },
+
+    "macro + market_structure": {
+      "description": "Risk-off macro and weak liquidity amplify downside moves.",
+      "effects": {
+        "liquidityImpact": -8,
+        "volatilityImpact": 10,
+        "panicRiskImpact": 4
+      }
+    },
+
+    "fiat_inflation + adoption": {
+      "description": "Fiat weakness plus real adoption accelerates high-quality Mono usage.",
+      "effects": {
+        "monoDemandImpact": 8,
+        "savingsAdoptionImpact": 4,
+        "paymentAdoptionImpact": 2
+      }
+    },
+
+    "fiat_inflation + treasury_trust": {
+      "description": "Fiat weakness is dangerous when treasury fiat reserves are already questioned.",
+      "effects": {
+        "fiatTrustImpact": -8,
+        "runRiskImpact": 5,
+        "liquidityTrustImpact": -4
+      }
+    },
+
+    "regulation_political + fiat_displacement": {
+      "description": "High fiat displacement attracts government resistance.",
+      "effects": {
+        "governmentResistanceImpact": 8,
+        "bankingFrictionImpact": 6,
+        "regulatoryTrustImpact": -6
+      }
+    },
+
+    "banking_financial + mono_high_trust": {
+      "description": "Banking stress can strengthen Mono if Mono trust is already high.",
+      "effects": {
+        "monoDemandImpact": 12,
+        "savingsAdoptionImpact": 5,
+        "monoTrustImpact": 3
+      }
+    },
+
+    "banking_financial + mono_low_trust": {
+      "description": "Banking stress can hurt the whole system if Mono trust is weak.",
+      "effects": {
+        "monoSellPressureImpact": 10,
+        "liquidityTrustImpact": -8,
+        "panicRiskImpact": 6
+      }
+    }
+  },
+
+  "engineNotes": {
+    "familyDefaults": "Individual scenarios should start from family defaults, then override effect values.",
+    "stacking": "Multiple active families should be allowed, but scenario clustering should increase volatility and panic risk.",
+    "difficulty": "Difficulty should adjust frequency, intensity, clustering, and recovery, not change the meaning of scenario effects.",
+    "endogenousScenarios": "Endogenous scenarios should trigger from state conditions such as inventory stress, overheating, fiat weakness, and support failure.",
+    "exogenousScenarios": "Exogenous scenarios should represent outside-world events such as recession, regulation, banking stress, media attention, or competitor activity."
+  }
+}
