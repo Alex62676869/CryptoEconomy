@@ -1,0 +1,555 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Treasury | Mono & DIV</title>
+
+  <link rel="stylesheet" href="/styles.css" />
+
+  <style>
+    .treasury-table {
+      position: relative;
+      z-index: 1;
+      width: 100%;
+      margin-top: 18px;
+      border-collapse: collapse;
+      overflow: hidden;
+      border-radius: 18px;
+    }
+
+    .treasury-table th,
+    .treasury-table td {
+      padding: 12px 14px;
+      border-bottom: 1px solid rgba(148, 163, 184, 0.14);
+      color: var(--text-2);
+      text-align: left;
+      font-size: 0.88rem;
+      white-space: nowrap;
+    }
+
+    .treasury-table th {
+      color: var(--text-3);
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      background: rgba(2, 6, 23, 0.32);
+    }
+
+    .treasury-table tr:last-child td {
+      border-bottom: 0;
+    }
+
+    .treasury-table strong {
+      color: var(--text-1);
+    }
+
+    .table-wrap {
+      position: relative;
+      z-index: 1;
+      width: 100%;
+      overflow-x: auto;
+    }
+
+    .page-links {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .page-links a {
+      min-height: 40px;
+      display: inline-flex;
+      align-items: center;
+      padding: 0 14px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      color: var(--text-2);
+      background: rgba(15, 23, 42, 0.78);
+    }
+
+    .page-links a:hover {
+      color: var(--text-1);
+      border-color: var(--line-strong);
+    }
+  </style>
+</head>
+
+<body>
+  <div class="app-shell">
+    <header class="topbar">
+      <div class="brand">
+        <div class="brand-mark">M/D</div>
+        <div>
+          <h1>Treasury</h1>
+          <p>Coin reserves, fiat reserves, execution capacity, and support strength</p>
+        </div>
+      </div>
+
+      <div class="topbar-actions page-links">
+        <a href="/" target="_blank" rel="noopener noreferrer">Dashboard</a>
+        <a href="/economy" target="_blank" rel="noopener noreferrer">Economy Audit</a>
+        <a href="/defaults" target="_blank" rel="noopener noreferrer">Defaults</a>
+      </div>
+    </header>
+
+    <main class="dashboard">
+      <section class="hero-grid">
+        <article class="market-card market-card--treasury">
+          <div class="card-heading">
+            <div>
+              <p class="eyebrow">Fiat reserves</p>
+              <h2 id="fiatTotal">$0</h2>
+            </div>
+            <span class="asset-badge asset-badge--treasury">Fiat</span>
+          </div>
+
+          <div class="mini-stats">
+            <div>
+              <span>Real Fiat</span>
+              <strong id="fiatReal">$0</strong>
+            </div>
+            <div>
+              <span>Liquid Support</span>
+              <strong id="liquidSupport">$0</strong>
+            </div>
+            <div>
+              <span>Fiat Usefulness</span>
+              <strong id="fiatUsefulness">0/100</strong>
+            </div>
+            <div>
+              <span>Allocation Mode</span>
+              <strong id="allocationMode">Balanced</strong>
+            </div>
+          </div>
+        </article>
+
+        <article class="market-card market-card--mono">
+          <div class="card-heading">
+            <div>
+              <p class="eyebrow">Mono treasury</p>
+              <h2 id="monoReserve">0</h2>
+            </div>
+            <span class="asset-badge asset-badge--mono">Reserve</span>
+          </div>
+
+          <div class="mini-stats">
+            <div>
+              <span>Inventory Zone</span>
+              <strong id="monoZone">Unknown</strong>
+            </div>
+            <div>
+              <span>Control Score</span>
+              <strong id="monoControl">0/100</strong>
+            </div>
+            <div>
+              <span>Strategic Reserve</span>
+              <strong id="monoStrategicReserve">0</strong>
+            </div>
+            <div>
+              <span>Listed Supply</span>
+              <strong id="monoListedSupply">0</strong>
+            </div>
+          </div>
+        </article>
+
+        <article class="market-card market-card--div">
+          <div class="card-heading">
+            <div>
+              <p class="eyebrow">DIV treasury</p>
+              <h2 id="divReserve">0</h2>
+            </div>
+            <span class="asset-badge asset-badge--div">Reserve</span>
+          </div>
+
+          <div class="mini-stats">
+            <div>
+              <span>Inventory Zone</span>
+              <strong id="divZone">Unknown</strong>
+            </div>
+            <div>
+              <span>Control Score</span>
+              <strong id="divControl">0/100</strong>
+            </div>
+            <div>
+              <span>Strategic Reserve</span>
+              <strong id="divStrategicReserve">0</strong>
+            </div>
+            <div>
+              <span>Listed Supply</span>
+              <strong id="divListedSupply">0</strong>
+            </div>
+          </div>
+        </article>
+      </section>
+
+      <section class="content-grid">
+        <article class="panel">
+          <div class="panel-header">
+            <div>
+              <p class="eyebrow">Execution</p>
+              <h3>Current tick execution</h3>
+            </div>
+          </div>
+
+          <table class="treasury-table">
+            <tbody id="executionTable"></tbody>
+          </table>
+        </article>
+
+        <article class="panel">
+          <div class="panel-header">
+            <div>
+              <p class="eyebrow">Support capacity</p>
+              <h3>Defence strength</h3>
+            </div>
+          </div>
+
+          <table class="treasury-table">
+            <tbody id="supportTable"></tbody>
+          </table>
+        </article>
+
+        <article class="panel">
+          <div class="panel-header">
+            <div>
+              <p class="eyebrow">Fiat returns</p>
+              <h3>Reserve quality</h3>
+            </div>
+          </div>
+
+          <table class="treasury-table">
+            <tbody id="fiatReturnTable"></tbody>
+          </table>
+        </article>
+
+        <article class="panel">
+          <div class="panel-header">
+            <div>
+              <p class="eyebrow">Dividends</p>
+              <h3>DIV sustainability</h3>
+            </div>
+          </div>
+
+          <table class="treasury-table">
+            <tbody id="dividendTable"></tbody>
+          </table>
+        </article>
+      </section>
+
+      <section class="chart-grid">
+        <article class="panel panel--large">
+          <div class="panel-header">
+            <div>
+              <p class="eyebrow">Currency basket</p>
+              <h3>Fiat allocation by currency</h3>
+            </div>
+            <span class="panel-note">Shown when the public state exposes fiatCurrencies</span>
+          </div>
+
+          <div class="table-wrap">
+            <table class="treasury-table">
+              <thead>
+                <tr>
+                  <th>Currency</th>
+                  <th>USD Value</th>
+                  <th>Real USD</th>
+                  <th>Yield</th>
+                  <th>Real Return</th>
+                  <th>Liquidity</th>
+                  <th>Trust</th>
+                  <th>Risk</th>
+                </tr>
+              </thead>
+              <tbody id="currencyTable">
+                <tr>
+                  <td colspan="8">Waiting for currency data.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </article>
+
+        <article class="panel">
+          <div class="panel-header">
+            <div>
+              <p class="eyebrow">Warnings</p>
+              <h3>Treasury risk</h3>
+            </div>
+          </div>
+
+          <div class="message-list" id="warningList">
+            <p class="empty-state">No treasury warnings yet.</p>
+          </div>
+        </article>
+      </section>
+    </main>
+  </div>
+
+  <script>
+    "use strict";
+
+    const elements = {};
+    const ids = [
+      "fiatTotal", "fiatReal", "liquidSupport", "fiatUsefulness", "allocationMode",
+      "monoReserve", "monoZone", "monoControl", "monoStrategicReserve", "monoListedSupply",
+      "divReserve", "divZone", "divControl", "divStrategicReserve", "divListedSupply",
+      "executionTable", "supportTable", "fiatReturnTable", "dividendTable",
+      "currencyTable", "warningList"
+    ];
+
+    for (const id of ids) {
+      elements[id] = document.getElementById(id);
+    }
+
+    fetchState();
+    setInterval(fetchState, 1500);
+
+    async function fetchState() {
+      try {
+        const response = await fetch("/api/state", {
+          headers: {
+            Accept: "application/json"
+          }
+        });
+
+        if (!response.ok) {
+          throw new Error("State request failed");
+        }
+
+        render(await response.json());
+      } catch (error) {
+        console.warn(error.message);
+      }
+    }
+
+    function render(state) {
+      const fiat = state?.treasury?.fiat || {};
+      const mono = state?.treasury?.mono || {};
+      const div = state?.treasury?.div || {};
+
+      setText(elements.fiatTotal, formatUsdCompact(fiat.totalUsdNominal));
+      setText(elements.fiatReal, formatUsdCompact(fiat.totalUsdReal));
+      setText(elements.liquidSupport, formatUsdCompact(fiat.liquidSupportUsd));
+      setText(elements.fiatUsefulness, formatScore(fiat.fiatUsefulnessScore));
+      setText(elements.allocationMode, formatLabel(fiat.allocationMode || state?.policy?.treasury?.allocationMode || "balanced"));
+
+      setText(elements.monoReserve, formatCoins(mono.balance));
+      setText(elements.monoZone, formatLabel(mono.inventoryZone || "unknown"));
+      setText(elements.monoControl, formatScore(mono.controlScore));
+      setText(elements.monoStrategicReserve, formatCoins(state?.policy?.treasury?.minMonoReserve || 0));
+      setText(elements.monoListedSupply, formatCoins(state?.policy?.mono?.listedSupply));
+
+      setText(elements.divReserve, formatCoins(div.balance));
+      setText(elements.divZone, formatLabel(div.inventoryZone || "unknown"));
+      setText(elements.divControl, formatScore(div.controlScore));
+      setText(elements.divStrategicReserve, formatCoins(state?.policy?.treasury?.minDivReserve || 0));
+      setText(elements.divListedSupply, formatCoins(state?.policy?.div?.listedSupply));
+
+      renderTable(elements.executionTable, [
+        ["Execution Quality", formatScore(state?.treasury?.executionQuality)],
+        ["Absorption Capacity", formatScore(state?.treasury?.absorptionCapacityScore)],
+        ["Support Capacity", formatScore(state?.treasury?.supportCapacityScore)],
+        ["Mono Sold to Public", formatUsdCompact(state?.market?.mono?.executedBuyUsd)],
+        ["Mono Bought Back", formatCoins(state?.market?.mono?.executedSellCoins)],
+        ["DIV Sold to Public", formatUsdCompact(state?.market?.div?.executedBuyUsd)],
+        ["DIV Bought Back", formatCoins(state?.market?.div?.executedSellCoins)]
+      ]);
+
+      renderTable(elements.supportTable, [
+        ["Mono Unfilled Buy", formatUsdCompact(state?.market?.mono?.unfilledBuyDemandUsd)],
+        ["Mono Unfilled Sell", formatCoins(state?.market?.mono?.unfilledSellPressureCoins)],
+        ["DIV Unfilled Buy", formatUsdCompact(state?.market?.div?.unfilledBuyDemandUsd)],
+        ["DIV Unfilled Sell", formatCoins(state?.market?.div?.unfilledSellPressureCoins)],
+        ["Run Risk", formatPercent(state?.confidence?.runRisk)],
+        ["Panic Risk", formatPercent(state?.confidence?.panicRisk)],
+        ["Liquidity Trust", formatScore(state?.confidence?.liquidityTrust)]
+      ]);
+
+      renderTable(elements.fiatReturnTable, [
+        ["Blended Nominal Yield", formatPercent(fiat.blendedNominalYield)],
+        ["USD-Adjusted Return", formatPercent(fiat.blendedUsdAdjustedReturn)],
+        ["Blended Real Return", formatPercent(fiat.blendedRealReturn)],
+        ["Global M2 Share", `${Number(fiat.globalM2Share || 0).toFixed(6)}%`],
+        ["Next Dollar Destination", fiat.marginalNextDollarDestination || "Unknown"],
+        ["Most Saturated Currency", fiat.mostSaturatedCurrency || "Unknown"],
+        ["Largest FX Risk", fiat.largestFxRisk || "Unknown"],
+        ["Strongest Liquidity Reserve", fiat.strongestLiquidityReserve || "Unknown"]
+      ]);
+
+      renderTable(elements.dividendTable, [
+        ["Enabled", state?.policy?.dividends?.enabled ? "Yes" : "No"],
+        ["Automation", state?.policy?.dividends?.automationEnabled ? "Yes" : "No"],
+        ["Expectation Score", formatScore(state?.dividends?.expectationScore)],
+        ["Sustainability Score", formatScore(state?.dividends?.sustainabilityScore)],
+        ["Target Annual Distribution", formatCoins(state?.policy?.dividends?.targetAnnualDivDistribution)],
+        ["Max Per Tick", formatCoins(state?.policy?.dividends?.maxDistributionPerTick)]
+      ]);
+
+      renderCurrencyTable(state);
+      renderWarnings(state);
+    }
+
+    function renderCurrencyTable(state) {
+      if (!elements.currencyTable) return;
+
+      const currencies = state?.fiatCurrencies;
+
+      elements.currencyTable.innerHTML = "";
+
+      if (!currencies || typeof currencies !== "object") {
+        const row = document.createElement("tr");
+        row.innerHTML = `
+          <td colspan="8">
+            Currency breakdown is not exposed in public state yet. The aggregate fiat reserve numbers above are still available.
+          </td>
+        `;
+        elements.currencyTable.appendChild(row);
+        return;
+      }
+
+      const rows = Object.values(currencies)
+        .sort((a, b) => Number(b.usdEquivalent || 0) - Number(a.usdEquivalent || 0))
+        .slice(0, 30);
+
+      for (const currency of rows) {
+        const row = document.createElement("tr");
+
+        row.innerHTML = `
+          <td><strong>${escapeHtml(currency.code || "?")}</strong></td>
+          <td>${formatUsdCompact(currency.usdEquivalent)}</td>
+          <td>${formatUsdCompact(currency.realUsdEquivalent)}</td>
+          <td>${formatPercent(currency.nominalYield)}</td>
+          <td>${formatPercent(currency.realReturn)}</td>
+          <td>${formatScore(currency.liquidityScore)}</td>
+          <td>${formatScore(currency.trustScore)}</td>
+          <td>${escapeHtml(currency.riskWarning || "Normal")}</td>
+        `;
+
+        elements.currencyTable.appendChild(row);
+      }
+    }
+
+    function renderWarnings(state) {
+      const warnings = Array.isArray(state?.warnings)
+        ? state.warnings.filter((warning) => {
+          const text = `${warning.code || ""} ${warning.message || ""}`.toLowerCase();
+
+          return text.includes("treasury") ||
+            text.includes("fiat") ||
+            text.includes("reserve") ||
+            text.includes("liquid") ||
+            text.includes("inventory") ||
+            text.includes("currency");
+        }).slice(-10).reverse()
+        : [];
+
+      renderMessages(elements.warningList, warnings, "No treasury warnings yet.");
+    }
+
+    function renderTable(tableBody, rows) {
+      if (!tableBody) return;
+
+      tableBody.innerHTML = "";
+
+      for (const [label, value] of rows) {
+        const row = document.createElement("tr");
+
+        row.innerHTML = `
+          <td>${escapeHtml(label)}</td>
+          <td><strong>${escapeHtml(value)}</strong></td>
+        `;
+
+        tableBody.appendChild(row);
+      }
+    }
+
+    function renderMessages(element, items, emptyText) {
+      if (!element) return;
+
+      element.innerHTML = "";
+
+      if (!Array.isArray(items) || items.length === 0) {
+        const empty = document.createElement("p");
+        empty.className = "empty-state";
+        empty.textContent = emptyText;
+        element.appendChild(empty);
+        return;
+      }
+
+      for (const item of items) {
+        const card = document.createElement("article");
+        card.className = `message-card message-card--${normaliseSeverity(item.severity)}`;
+
+        const meta = document.createElement("div");
+        meta.className = "message-card__meta";
+        meta.textContent = `${item.severity || "info"} · ${item.code || "treasury"}`;
+
+        const text = document.createElement("p");
+        text.textContent = item.message || "Treasury warning";
+
+        card.appendChild(meta);
+        card.appendChild(text);
+        element.appendChild(card);
+      }
+    }
+
+    function normaliseSeverity(severity) {
+      if (severity === "critical" || severity === "severe" || severity === "crisis") return "critical";
+      if (severity === "high" || severity === "serious") return "high";
+      if (severity === "medium" || severity === "moderate") return "medium";
+      return "info";
+    }
+
+    function setText(element, value) {
+      if (element) element.textContent = value;
+    }
+
+    function formatUsdCompact(value) {
+      const number = Number(value || 0);
+      const abs = Math.abs(number);
+
+      if (abs >= 1_000_000_000_000) return `$${(number / 1_000_000_000_000).toFixed(2)}T`;
+      if (abs >= 1_000_000_000) return `$${(number / 1_000_000_000).toFixed(2)}B`;
+      if (abs >= 1_000_000) return `$${(number / 1_000_000).toFixed(2)}M`;
+      if (abs >= 1_000) return `$${(number / 1_000).toFixed(2)}K`;
+
+      return `$${number.toFixed(2)}`;
+    }
+
+    function formatCoins(value) {
+      const number = Number(value || 0);
+      const abs = Math.abs(number);
+
+      if (abs >= 1_000_000_000_000) return `${(number / 1_000_000_000_000).toFixed(2)}T`;
+      if (abs >= 1_000_000_000) return `${(number / 1_000_000_000).toFixed(2)}B`;
+      if (abs >= 1_000_000) return `${(number / 1_000_000).toFixed(2)}M`;
+      if (abs >= 1_000) return `${(number / 1_000).toFixed(2)}K`;
+
+      return number.toFixed(2);
+    }
+
+    function formatScore(value) {
+      return `${Number(value || 0).toFixed(1)}/100`;
+    }
+
+    function formatPercent(value) {
+      return `${(Number(value || 0) * 100).toFixed(2)}%`;
+    }
+
+    function formatLabel(value) {
+      return String(value || "")
+        .replace(/_/g, " ")
+        .replace(/\b\w/g, (letter) => letter.toUpperCase());
+    }
+
+    function escapeHtml(value) {
+      return String(value ?? "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;");
+    }
+  </script>
+</body>
+</html>
