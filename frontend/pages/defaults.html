@@ -1,0 +1,707 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Defaults | Mono & DIV</title>
+
+  <link rel="stylesheet" href="/styles.css" />
+
+  <style>
+    .page-links {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .page-links a {
+      min-height: 40px;
+      display: inline-flex;
+      align-items: center;
+      padding: 0 14px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      color: var(--text-2);
+      background: rgba(15, 23, 42, 0.78);
+    }
+
+    .page-links a:hover {
+      color: var(--text-1);
+      border-color: var(--line-strong);
+    }
+
+    .status-box {
+      position: relative;
+      z-index: 1;
+      margin-top: 18px;
+      padding: 14px;
+      border: 1px solid rgba(148, 163, 184, 0.16);
+      border-radius: 16px;
+      color: var(--text-2);
+      background: rgba(2, 6, 23, 0.35);
+      line-height: 1.45;
+      font-size: 0.9rem;
+    }
+
+    .status-box strong {
+      color: var(--text-1);
+    }
+
+    .danger-button {
+      min-height: 44px;
+      border: 1px solid rgba(252, 165, 165, 0.35) !important;
+      color: var(--bad) !important;
+      background: rgba(252, 165, 165, 0.12) !important;
+      box-shadow: none !important;
+    }
+
+    .danger-button:hover {
+      filter: brightness(1.1);
+    }
+  </style>
+</head>
+
+<body>
+  <div class="app-shell">
+    <header class="topbar">
+      <div class="brand">
+        <div class="brand-mark">M/D</div>
+        <div>
+          <h1>Defaults</h1>
+          <p>Difficulty, adoption mode, scenario settings, tick speed, and simulation reset</p>
+        </div>
+      </div>
+
+      <div class="topbar-actions page-links">
+        <a href="/" target="_blank" rel="noopener noreferrer">Dashboard</a>
+        <a href="/economy" target="_blank" rel="noopener noreferrer">Economy Audit</a>
+        <a href="/treasury" target="_blank" rel="noopener noreferrer">Treasury</a>
+      </div>
+    </header>
+
+    <main class="dashboard">
+      <section class="hero-grid">
+        <article class="market-card market-card--treasury">
+          <div class="card-heading">
+            <div>
+              <p class="eyebrow">Current difficulty</p>
+              <h2 id="currentDifficulty">Normal</h2>
+            </div>
+            <span class="asset-badge asset-badge--treasury">Defaults</span>
+          </div>
+
+          <div class="mini-stats">
+            <div>
+              <span>Adoption Mode</span>
+              <strong id="currentAdoptionMode">Normal</strong>
+            </div>
+            <div>
+              <span>Scenario Frequency</span>
+              <strong id="currentScenarioFrequency">Normal</strong>
+            </div>
+            <div>
+              <span>Scenario Intensity</span>
+              <strong id="currentScenarioIntensity">Normal</strong>
+            </div>
+            <div>
+              <span>Tick</span>
+              <strong id="currentTick">0</strong>
+            </div>
+          </div>
+        </article>
+
+        <article class="market-card market-card--mono">
+          <div class="card-heading">
+            <div>
+              <p class="eyebrow">Runtime</p>
+              <h2 id="runtimeStatus">Running</h2>
+            </div>
+            <span class="asset-badge asset-badge--mono">Server</span>
+          </div>
+
+          <div class="mini-stats">
+            <div>
+              <span>Simulated Day</span>
+              <strong id="simulatedDay">0</strong>
+            </div>
+            <div>
+              <span>Online Player</span>
+              <strong id="playerOnline">Unknown</strong>
+            </div>
+            <div>
+              <span>Offline Mode</span>
+              <strong id="offlineModeDisplay">Paused</strong>
+            </div>
+            <div>
+              <span>Tick Speed</span>
+              <strong id="tickSpeedDisplay">1000ms</strong>
+            </div>
+          </div>
+        </article>
+
+        <article class="market-card market-card--div">
+          <div class="card-heading">
+            <div>
+              <p class="eyebrow">Model preset</p>
+              <h2 id="modelPresetDisplay">Balanced</h2>
+            </div>
+            <span class="asset-badge asset-badge--div">Model</span>
+          </div>
+
+          <div class="mini-stats">
+            <div>
+              <span>Trust</span>
+              <strong id="trustDisplay">0/100</strong>
+            </div>
+            <div>
+              <span>Treasury Control</span>
+              <strong id="treasuryControlDisplay">0/100</strong>
+            </div>
+            <div>
+              <span>Fiat Displacement</span>
+              <strong id="fiatDisplacementDisplay">0/100</strong>
+            </div>
+            <div>
+              <span>Active Scenarios</span>
+              <strong id="activeScenariosDisplay">0</strong>
+            </div>
+          </div>
+        </article>
+      </section>
+
+      <section class="content-grid">
+        <article class="panel">
+          <div class="panel-header">
+            <div>
+              <p class="eyebrow">Simulation defaults</p>
+              <h3>Difficulty and adoption</h3>
+            </div>
+          </div>
+
+          <form class="control-form" id="defaultsForm">
+            <label>
+              Difficulty
+              <select id="difficultyInput">
+                <option value="sandbox">Sandbox</option>
+                <option value="normal">Normal</option>
+                <option value="hard">Hard</option>
+                <option value="brutal">Brutal</option>
+                <option value="historical_chaos">Historical Chaos</option>
+              </select>
+            </label>
+
+            <label>
+              Adoption Mode
+              <select id="adoptionModeInput">
+                <option value="low">Low</option>
+                <option value="normal">Normal</option>
+                <option value="high">High</option>
+                <option value="hyper">Hyper</option>
+              </select>
+            </label>
+
+            <label>
+              Model Preset
+              <select id="modelPresetInput">
+                <option value="balanced_realism">Balanced Realism</option>
+                <option value="market_heavy_realism">Market Heavy Realism</option>
+                <option value="macro_heavy_realism">Macro Heavy Realism</option>
+                <option value="sandbox_debug">Sandbox Debug</option>
+              </select>
+            </label>
+
+            <button type="submit">Update Defaults</button>
+          </form>
+
+          <div class="status-box" id="defaultsStatus">
+            Waiting for server state.
+          </div>
+        </article>
+
+        <article class="panel">
+          <div class="panel-header">
+            <div>
+              <p class="eyebrow">Scenario settings</p>
+              <h3>Shock environment</h3>
+            </div>
+          </div>
+
+          <form class="control-form" id="scenarioForm">
+            <label>
+              Scenario Frequency
+              <select id="scenarioFrequencyInput">
+                <option value="low">Low</option>
+                <option value="normal">Normal</option>
+                <option value="high">High</option>
+              </select>
+            </label>
+
+            <label>
+              Scenario Intensity
+              <select id="scenarioIntensityInput">
+                <option value="low">Low</option>
+                <option value="normal">Normal</option>
+                <option value="high">High</option>
+              </select>
+            </label>
+
+            <label>
+              Offline Simulation
+              <select id="offlineModeInput">
+                <option value="paused">Paused</option>
+                <option value="capped">Capped</option>
+                <option value="unlimited">Unlimited</option>
+              </select>
+            </label>
+
+            <button type="submit">Update Scenario Defaults</button>
+          </form>
+
+          <div class="status-box">
+            <strong>Tip:</strong> High adoption plus high scenario frequency can create rapid growth, but it can also drain treasury reserves and increase volatility.
+          </div>
+        </article>
+
+        <article class="panel">
+          <div class="panel-header">
+            <div>
+              <p class="eyebrow">Tick speed</p>
+              <h3>Simulation time</h3>
+            </div>
+          </div>
+
+          <form class="control-form" id="tickForm">
+            <label>
+              Tick MS
+              <input id="tickMsInput" type="number" min="250" step="250" value="1000" />
+            </label>
+
+            <label>
+              Simulated Days Per Tick
+              <input id="simulatedDaysPerTickInput" type="number" min="0.01" step="0.01" value="1" />
+            </label>
+
+            <button type="submit">Update Tick Defaults</button>
+          </form>
+
+          <div class="status-box">
+            The current loop may need a restart before a changed tick interval fully applies, but simulated days per tick can still be stored in defaults.
+          </div>
+        </article>
+
+        <article class="panel">
+          <div class="panel-header">
+            <div>
+              <p class="eyebrow">Treasury policy</p>
+              <h3>Reserve allocation</h3>
+            </div>
+          </div>
+
+          <form class="control-form" id="treasuryPolicyForm">
+            <label>
+              Allocation Mode
+              <select id="allocationModeInput">
+                <option value="balanced">Balanced</option>
+                <option value="safety_first">Safety First</option>
+                <option value="yield_seeking">Yield Seeking</option>
+                <option value="liquidity_first">Liquidity First</option>
+              </select>
+            </label>
+
+            <label class="checkbox-row">
+              <input id="preserveStrategicReservesInput" type="checkbox" checked />
+              Preserve strategic reserves
+            </label>
+
+            <label>
+              Minimum Mono Reserve
+              <input id="minMonoReserveInput" type="number" min="0" step="1000000" value="30000000000000" />
+            </label>
+
+            <label>
+              Minimum DIV Reserve
+              <input id="minDivReserveInput" type="number" min="0" step="1000000" value="30000000000000" />
+            </label>
+
+            <button type="submit">Update Treasury Policy</button>
+          </form>
+        </article>
+      </section>
+
+      <section class="bottom-grid">
+        <article class="panel">
+          <div class="panel-header">
+            <div>
+              <p class="eyebrow">Reset</p>
+              <h3>Restart simulation</h3>
+            </div>
+          </div>
+
+          <div class="status-box">
+            Resetting returns the economy to the initial state. Use this after changing big defaults if you want a fresh test.
+          </div>
+
+          <form class="control-form" id="resetForm">
+            <button class="danger-button" type="submit">Reset Simulation</button>
+          </form>
+        </article>
+
+        <article class="panel">
+          <div class="panel-header">
+            <div>
+              <p class="eyebrow">Warnings</p>
+              <h3>Current risks</h3>
+            </div>
+          </div>
+
+          <div class="message-list" id="warningList">
+            <p class="empty-state">No warnings yet.</p>
+          </div>
+        </article>
+
+        <article class="panel">
+          <div class="panel-header">
+            <div>
+              <p class="eyebrow">Server response</p>
+              <h3>Last action</h3>
+            </div>
+          </div>
+
+          <div class="status-box" id="actionStatus">
+            No action taken yet.
+          </div>
+        </article>
+      </section>
+    </main>
+  </div>
+
+  <script>
+    "use strict";
+
+    const elements = {};
+    const ids = [
+      "currentDifficulty", "currentAdoptionMode", "currentScenarioFrequency", "currentScenarioIntensity", "currentTick",
+      "runtimeStatus", "simulatedDay", "playerOnline", "offlineModeDisplay", "tickSpeedDisplay",
+      "modelPresetDisplay", "trustDisplay", "treasuryControlDisplay", "fiatDisplacementDisplay", "activeScenariosDisplay",
+
+      "difficultyInput", "adoptionModeInput", "modelPresetInput",
+      "scenarioFrequencyInput", "scenarioIntensityInput", "offlineModeInput",
+      "tickMsInput", "simulatedDaysPerTickInput",
+      "allocationModeInput", "preserveStrategicReservesInput", "minMonoReserveInput", "minDivReserveInput",
+
+      "defaultsForm", "scenarioForm", "tickForm", "treasuryPolicyForm", "resetForm",
+      "defaultsStatus", "actionStatus", "warningList"
+    ];
+
+    for (const id of ids) {
+      elements[id] = document.getElementById(id);
+    }
+
+    let latestState = null;
+
+    setupForms();
+    fetchState();
+    setInterval(fetchState, 1500);
+
+    function setupForms() {
+      elements.defaultsForm?.addEventListener("submit", async (event) => {
+        event.preventDefault();
+
+        await postDefaults({
+          difficulty: elements.difficultyInput.value,
+          adoptionMode: elements.adoptionModeInput.value,
+          modelPreset: elements.modelPresetInput.value
+        });
+      });
+
+      elements.scenarioForm?.addEventListener("submit", async (event) => {
+        event.preventDefault();
+
+        await postDefaults({
+          scenarios: {
+            frequency: elements.scenarioFrequencyInput.value,
+            intensity: elements.scenarioIntensityInput.value
+          },
+          offlineSimulation: {
+            mode: elements.offlineModeInput.value
+          }
+        });
+      });
+
+      elements.tickForm?.addEventListener("submit", async (event) => {
+        event.preventDefault();
+
+        await postDefaults({
+          tickSpeed: {
+            tickMs: readNumber(elements.tickMsInput),
+            simulatedDaysPerTick: readNumber(elements.simulatedDaysPerTickInput)
+          }
+        });
+      });
+
+      elements.treasuryPolicyForm?.addEventListener("submit", async (event) => {
+        event.preventDefault();
+
+        await postPolicy({
+          treasury: {
+            allocationMode: elements.allocationModeInput.value,
+            preserveStrategicReserves: Boolean(elements.preserveStrategicReservesInput.checked),
+            minMonoReserve: readNumber(elements.minMonoReserveInput),
+            minDivReserve: readNumber(elements.minDivReserveInput)
+          }
+        });
+      });
+
+      elements.resetForm?.addEventListener("submit", async (event) => {
+        event.preventDefault();
+
+        const confirmed = window.confirm("Reset the Mono & DIV simulation to the initial state?");
+
+        if (!confirmed) {
+          return;
+        }
+
+        await postReset();
+      });
+    }
+
+    async function fetchState() {
+      try {
+        const response = await fetch("/api/state", {
+          headers: {
+            Accept: "application/json"
+          }
+        });
+
+        if (!response.ok) {
+          throw new Error("State request failed");
+        }
+
+        latestState = await response.json();
+        render(latestState);
+      } catch (error) {
+        setActionStatus(`Could not fetch state: ${error.message}`, "high");
+      }
+    }
+
+    async function postDefaults(patch) {
+      try {
+        const response = await fetch("/api/defaults", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Accept: "application/json"
+          },
+          body: JSON.stringify(patch)
+        });
+
+        const result = await response.json();
+
+        if (!response.ok) {
+          throw new Error(result.error || result.message || "Defaults update failed");
+        }
+
+        latestState = result;
+        render(result);
+        setActionStatus("Defaults updated successfully.", "info");
+      } catch (error) {
+        setActionStatus(`Defaults update failed: ${error.message}`, "high");
+      }
+    }
+
+    async function postPolicy(patch) {
+      try {
+        const response = await fetch("/api/policy", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Accept: "application/json"
+          },
+          body: JSON.stringify(patch)
+        });
+
+        const result = await response.json();
+
+        if (!response.ok) {
+          throw new Error(result.error || result.message || "Policy update failed");
+        }
+
+        latestState = result;
+        render(result);
+        setActionStatus("Treasury policy updated successfully.", "info");
+      } catch (error) {
+        setActionStatus(`Treasury policy update failed: ${error.message}`, "high");
+      }
+    }
+
+    async function postReset() {
+      try {
+        const response = await fetch("/api/reset", {
+          method: "POST",
+          headers: {
+            Accept: "application/json"
+          }
+        });
+
+        const result = await response.json();
+
+        if (!response.ok) {
+          throw new Error(result.error || result.message || "Reset failed");
+        }
+
+        latestState = result;
+        render(result);
+        setActionStatus("Simulation reset successfully.", "info");
+      } catch (error) {
+        setActionStatus(`Reset failed: ${error.message}`, "high");
+      }
+    }
+
+    function render(state) {
+      const defaults = state?.defaults || {};
+      const runtime = state?.runtime || {};
+      const scenarios = defaults.scenarios || {};
+      const offline = defaults.offlineSimulation || {};
+      const tickSpeed = defaults.tickSpeed || {};
+      const policyTreasury = state?.policy?.treasury || {};
+
+      setText(elements.currentDifficulty, formatLabel(defaults.difficulty || "normal"));
+      setText(elements.currentAdoptionMode, formatLabel(defaults.adoptionMode || "normal"));
+      setText(elements.currentScenarioFrequency, formatLabel(scenarios.frequency || "normal"));
+      setText(elements.currentScenarioIntensity, formatLabel(scenarios.intensity || "normal"));
+      setText(elements.currentTick, formatWhole(runtime.tick));
+
+      setText(elements.runtimeStatus, runtime.isRunning === false ? "Stopped" : "Running");
+      setText(elements.simulatedDay, formatWhole(runtime.simulatedDay));
+      setText(elements.playerOnline, runtime.playerOnline ? "Yes" : "No");
+      setText(elements.offlineModeDisplay, formatLabel(offline.mode || "paused"));
+      setText(elements.tickSpeedDisplay, `${Number(tickSpeed.tickMs || 1000)}ms`);
+
+      setText(elements.modelPresetDisplay, formatLabel(defaults.modelPreset || "balanced_realism"));
+      setText(elements.trustDisplay, formatScore(state?.confidence?.systemicTrust));
+      setText(elements.treasuryControlDisplay, formatScore(state?.treasury?.controlScore));
+      setText(elements.fiatDisplacementDisplay, formatScore(state?.fiatDisplacement?.index));
+      setText(elements.activeScenariosDisplay, formatWhole(state?.scenarios?.active?.length || 0));
+
+      setSelect(elements.difficultyInput, defaults.difficulty || "normal");
+      setSelect(elements.adoptionModeInput, defaults.adoptionMode || "normal");
+      setSelect(elements.modelPresetInput, defaults.modelPreset || "balanced_realism");
+
+      setSelect(elements.scenarioFrequencyInput, scenarios.frequency || "normal");
+      setSelect(elements.scenarioIntensityInput, scenarios.intensity || "normal");
+      setSelect(elements.offlineModeInput, offline.mode || "paused");
+
+      setInput(elements.tickMsInput, tickSpeed.tickMs || 1000);
+      setInput(elements.simulatedDaysPerTickInput, tickSpeed.simulatedDaysPerTick || 1);
+
+      setSelect(elements.allocationModeInput, policyTreasury.allocationMode || "balanced");
+      setCheckbox(elements.preserveStrategicReservesInput, policyTreasury.preserveStrategicReserves !== false);
+      setInput(elements.minMonoReserveInput, policyTreasury.minMonoReserve || 30000000000000);
+      setInput(elements.minDivReserveInput, policyTreasury.minDivReserve || 30000000000000);
+
+      setText(
+        elements.defaultsStatus,
+        `Current setup: ${formatLabel(defaults.difficulty || "normal")} difficulty, ${formatLabel(defaults.adoptionMode || "normal")} adoption, ${formatLabel(scenarios.frequency || "normal")} scenario frequency, and ${formatLabel(scenarios.intensity || "normal")} scenario intensity.`
+      );
+
+      renderWarnings(state);
+    }
+
+    function renderWarnings(state) {
+      const warnings = Array.isArray(state?.warnings)
+        ? state.warnings.slice(-10).reverse()
+        : [];
+
+      if (!elements.warningList) return;
+
+      elements.warningList.innerHTML = "";
+
+      if (warnings.length === 0) {
+        const empty = document.createElement("p");
+        empty.className = "empty-state";
+        empty.textContent = "No warnings yet.";
+        elements.warningList.appendChild(empty);
+        return;
+      }
+
+      for (const warning of warnings) {
+        const card = document.createElement("article");
+        card.className = `message-card message-card--${normaliseSeverity(warning.severity)}`;
+
+        const meta = document.createElement("div");
+        meta.className = "message-card__meta";
+        meta.textContent = `${warning.severity || "info"} · ${warning.code || "warning"}`;
+
+        const text = document.createElement("p");
+        text.textContent = warning.message || "Warning";
+
+        card.appendChild(meta);
+        card.appendChild(text);
+        elements.warningList.appendChild(card);
+      }
+    }
+
+    function setActionStatus(message, severity) {
+      if (!elements.actionStatus) return;
+
+      elements.actionStatus.innerHTML = `<strong>${escapeHtml(formatLabel(severity || "info"))}:</strong> ${escapeHtml(message)}`;
+    }
+
+    function setText(element, value) {
+      if (element) element.textContent = value;
+    }
+
+    function setSelect(element, value) {
+      if (!element) return;
+      if (document.activeElement === element) return;
+      element.value = value;
+    }
+
+    function setInput(element, value) {
+      if (!element) return;
+      if (document.activeElement === element) return;
+      element.value = String(value ?? "");
+    }
+
+    function setCheckbox(element, value) {
+      if (!element) return;
+      if (document.activeElement === element) return;
+      element.checked = Boolean(value);
+    }
+
+    function readNumber(input) {
+      const number = Number(input?.value || 0);
+      return Number.isFinite(number) ? number : 0;
+    }
+
+    function normaliseSeverity(severity) {
+      if (severity === "critical" || severity === "severe" || severity === "crisis") return "critical";
+      if (severity === "high" || severity === "serious") return "high";
+      if (severity === "medium" || severity === "moderate") return "medium";
+      return "info";
+    }
+
+    function formatScore(value) {
+      return `${Number(value || 0).toFixed(1)}/100`;
+    }
+
+    function formatWhole(value) {
+      return Math.round(Number(value || 0)).toLocaleString("en-US");
+    }
+
+    function formatLabel(value) {
+      return String(value || "")
+        .replace(/_/g, " ")
+        .replace(/\b\w/g, (letter) => letter.toUpperCase());
+    }
+
+    function escapeHtml(value) {
+      return String(value ?? "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;");
+    }
+  </script>
+</body>
+</html>
