@@ -1,0 +1,38 @@
+{
+  "name": "mono-div-economy-game",
+  "version": "1.0.0",
+  "description": "Server-authoritative Mono and DIV crypto-domination economic simulation game.",
+  "main": "server/index.js",
+  "type": "commonjs",
+  "scripts": {
+    "start": "node server/index.js",
+    "dev": "nodemon server/index.js",
+    "test": "node --test",
+    "test:watch": "node --test --watch",
+    "check": "node --check server/index.js"
+  },
+  "keywords": [
+    "simulation",
+    "economics",
+    "game",
+    "crypto",
+    "treasury",
+    "websocket",
+    "node"
+  ],
+  "author": "Alex Kahts",
+  "license": "UNLICENSED",
+  "private": true,
+  "engines": {
+    "node": ">=20.0.0"
+  },
+  "dependencies": {
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "pg": "^8.13.1",
+    "ws": "^8.18.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.9"
+  }
+}
