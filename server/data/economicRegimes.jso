@@ -1,0 +1,570 @@
+{
+  "version": "1.0.0",
+  "purpose": "Macro and market regime definitions for the Mono & DIV Economy Game.",
+  "principle": "Economic regimes should shape demand, liquidity, volatility, trust, fiat usefulness, and scenario probability without replacing the core engine rules.",
+
+  "defaultRegime": "calm_expansion",
+
+  "regimeVariables": {
+    "riskMood": {
+      "values": ["risk_on", "neutral", "risk_off"],
+      "description": "General market appetite for risk."
+    },
+    "recessionRisk": {
+      "min": 0,
+      "max": 1,
+      "description": "Probability-like pressure representing economic slowdown fear."
+    },
+    "inflationFear": {
+      "min": 0,
+      "max": 1,
+      "description": "Pressure from fear that fiat purchasing power is weakening."
+    },
+    "cryptoSentiment": {
+      "min": 0,
+      "max": 1,
+      "description": "General market openness toward crypto-like monetary systems."
+    },
+    "regulationPressure": {
+      "min": 0,
+      "max": 1,
+      "description": "Political, legal, and regulatory pressure against Mono and DIV."
+    },
+    "mediaAttention": {
+      "min": 0,
+      "max": 1,
+      "description": "Public attention level. Attention can create demand but is not the same as adoption."
+    },
+    "bankingStress": {
+      "min": 0,
+      "max": 1,
+      "description": "Stress in the traditional banking system."
+    }
+  },
+
+  "regimes": {
+    "calm_expansion": {
+      "label": "Calm Expansion",
+      "description": "Default stable environment. Demand grows slowly, trust can recover, and volatility is contained.",
+      "riskMood": "neutral",
+      "baseline": {
+        "recessionRisk": 0.05,
+        "inflationFear": 0.1,
+        "cryptoSentiment": 0.5,
+        "regulationPressure": 0.05,
+        "mediaAttention": 0.05,
+        "bankingStress": 0.03
+      },
+      "effects": {
+        "monoDemandMultiplier": 1,
+        "divDemandMultiplier": 1,
+        "monoSellPressureMultiplier": 1,
+        "divSellPressureMultiplier": 1,
+        "liquidityMultiplier": 1,
+        "volatilityMultiplier": 1,
+        "trustRecoveryMultiplier": 1,
+        "adoptionQualityMultiplier": 1,
+        "fiatUsefulnessMultiplier": 1,
+        "scenarioFrequencyMultiplier": 1
+      },
+      "scenarioBias": {
+        "promotion_attention": 1,
+        "adoption": 1,
+        "dividend": 1,
+        "treasury_trust": 0.8,
+        "market_structure": 1,
+        "macro": 0.8,
+        "fiat_inflation": 0.7,
+        "regulation_political": 0.7,
+        "banking_financial": 0.6,
+        "competition_technology": 1
+      }
+    },
+
+    "risk_on_expansion": {
+      "label": "Risk-On Expansion",
+      "description": "Optimistic market environment. DIV benefits more than Mono, but overheating risk increases.",
+      "riskMood": "risk_on",
+      "baseline": {
+        "recessionRisk": 0.03,
+        "inflationFear": 0.08,
+        "cryptoSentiment": 0.65,
+        "regulationPressure": 0.06,
+        "mediaAttention": 0.15,
+        "bankingStress": 0.02
+      },
+      "effects": {
+        "monoDemandMultiplier": 1.08,
+        "divDemandMultiplier": 1.28,
+        "monoSellPressureMultiplier": 0.9,
+        "divSellPressureMultiplier": 0.92,
+        "liquidityMultiplier": 1.12,
+        "volatilityMultiplier": 1.08,
+        "trustRecoveryMultiplier": 1.05,
+        "adoptionQualityMultiplier": 0.98,
+        "fiatUsefulnessMultiplier": 0.99,
+        "scenarioFrequencyMultiplier": 1.05
+      },
+      "scenarioBias": {
+        "promotion_attention": 1.35,
+        "adoption": 1.15,
+        "dividend": 1.25,
+        "treasury_trust": 0.9,
+        "market_structure": 1,
+        "macro": 0.8,
+        "fiat_inflation": 0.75,
+        "regulation_political": 0.85,
+        "banking_financial": 0.6,
+        "competition_technology": 1.1
+      }
+    },
+
+    "crypto_euphoria": {
+      "label": "Crypto Euphoria",
+      "description": "Extreme attention and positive sentiment. Demand rises quickly, but speculation, bubbles, and regulatory attention increase.",
+      "riskMood": "risk_on",
+      "baseline": {
+        "recessionRisk": 0.04,
+        "inflationFear": 0.12,
+        "cryptoSentiment": 0.82,
+        "regulationPressure": 0.18,
+        "mediaAttention": 0.55,
+        "bankingStress": 0.04
+      },
+      "effects": {
+        "monoDemandMultiplier": 1.25,
+        "divDemandMultiplier": 1.75,
+        "monoSellPressureMultiplier": 0.85,
+        "divSellPressureMultiplier": 0.95,
+        "liquidityMultiplier": 1.2,
+        "volatilityMultiplier": 1.45,
+        "trustRecoveryMultiplier": 1,
+        "adoptionQualityMultiplier": 0.86,
+        "fiatUsefulnessMultiplier": 0.96,
+        "scenarioFrequencyMultiplier": 1.25
+      },
+      "scenarioBias": {
+        "promotion_attention": 1.8,
+        "adoption": 1.25,
+        "dividend": 1.6,
+        "treasury_trust": 1.15,
+        "market_structure": 1.25,
+        "macro": 0.9,
+        "fiat_inflation": 0.9,
+        "regulation_political": 1.35,
+        "banking_financial": 0.7,
+        "competition_technology": 1.25
+      },
+      "warnings": [
+        "High demand may be low quality.",
+        "DIV overheating risk is elevated.",
+        "Treasury inventory can fall quickly if listed supply is too high.",
+        "Regulation pressure tends to rise after sustained euphoria."
+      ]
+    },
+
+    "risk_off": {
+      "label": "Risk-Off",
+      "description": "Defensive environment. DIV demand weakens, Mono may hold up if trust is strong, and liquidity becomes more fragile.",
+      "riskMood": "risk_off",
+      "baseline": {
+        "recessionRisk": 0.25,
+        "inflationFear": 0.15,
+        "cryptoSentiment": 0.35,
+        "regulationPressure": 0.12,
+        "mediaAttention": 0.12,
+        "bankingStress": 0.15
+      },
+      "effects": {
+        "monoDemandMultiplier": 0.98,
+        "divDemandMultiplier": 0.72,
+        "monoSellPressureMultiplier": 1.12,
+        "divSellPressureMultiplier": 1.35,
+        "liquidityMultiplier": 0.82,
+        "volatilityMultiplier": 1.35,
+        "trustRecoveryMultiplier": 0.9,
+        "adoptionQualityMultiplier": 0.95,
+        "fiatUsefulnessMultiplier": 1.02,
+        "scenarioFrequencyMultiplier": 1.2
+      },
+      "scenarioBias": {
+        "promotion_attention": 0.7,
+        "adoption": 0.8,
+        "dividend": 0.95,
+        "treasury_trust": 1.25,
+        "market_structure": 1.25,
+        "macro": 1.4,
+        "fiat_inflation": 1,
+        "regulation_political": 1.1,
+        "banking_financial": 1.25,
+        "competition_technology": 1
+      }
+    },
+
+    "recession_fear": {
+      "label": "Recession Fear",
+      "description": "The market expects economic weakness. Speculative demand falls, sell pressure rises, and liquidity becomes thinner.",
+      "riskMood": "risk_off",
+      "baseline": {
+        "recessionRisk": 0.62,
+        "inflationFear": 0.18,
+        "cryptoSentiment": 0.3,
+        "regulationPressure": 0.12,
+        "mediaAttention": 0.2,
+        "bankingStress": 0.25
+      },
+      "effects": {
+        "monoDemandMultiplier": 1.02,
+        "divDemandMultiplier": 0.58,
+        "monoSellPressureMultiplier": 1.18,
+        "divSellPressureMultiplier": 1.55,
+        "liquidityMultiplier": 0.72,
+        "volatilityMultiplier": 1.65,
+        "trustRecoveryMultiplier": 0.82,
+        "adoptionQualityMultiplier": 0.92,
+        "fiatUsefulnessMultiplier": 1,
+        "scenarioFrequencyMultiplier": 1.35
+      },
+      "scenarioBias": {
+        "promotion_attention": 0.55,
+        "adoption": 0.7,
+        "dividend": 1,
+        "treasury_trust": 1.45,
+        "market_structure": 1.4,
+        "macro": 1.8,
+        "fiat_inflation": 1.05,
+        "regulation_political": 1.15,
+        "banking_financial": 1.55,
+        "competition_technology": 1.1
+      },
+      "warnings": [
+        "DIV is vulnerable during recession fear.",
+        "Mono only benefits if stability trust remains high.",
+        "Liquidity shocks become more dangerous."
+      ]
+    },
+
+    "inflation_fear": {
+      "label": "Inflation Fear",
+      "description": "Fiat purchasing power is questioned. Mono savings demand rises if trust is high, but volatility and political attention can also increase.",
+      "riskMood": "neutral",
+      "baseline": {
+        "recessionRisk": 0.18,
+        "inflationFear": 0.68,
+        "cryptoSentiment": 0.58,
+        "regulationPressure": 0.18,
+        "mediaAttention": 0.28,
+        "bankingStress": 0.12
+      },
+      "effects": {
+        "monoDemandMultiplier": 1.32,
+        "divDemandMultiplier": 1.08,
+        "monoSellPressureMultiplier": 0.95,
+        "divSellPressureMultiplier": 1.05,
+        "liquidityMultiplier": 0.95,
+        "volatilityMultiplier": 1.25,
+        "trustRecoveryMultiplier": 0.95,
+        "adoptionQualityMultiplier": 1.02,
+        "fiatUsefulnessMultiplier": 0.82,
+        "scenarioFrequencyMultiplier": 1.25
+      },
+      "scenarioBias": {
+        "promotion_attention": 1.15,
+        "adoption": 1.2,
+        "dividend": 1.1,
+        "treasury_trust": 1,
+        "market_structure": 1.1,
+        "macro": 1.35,
+        "fiat_inflation": 1.8,
+        "regulation_political": 1.25,
+        "banking_financial": 1.1,
+        "competition_technology": 1
+      },
+      "warnings": [
+        "Fiat weakness can create inflow, but Mono trust must convert that inflow into adoption.",
+        "Treasury fiat reserves may grow nominally while losing real usefulness."
+      ]
+    },
+
+    "banking_stress": {
+      "label": "Banking Stress",
+      "description": "Traditional banking reliability is questioned. Mono can benefit as a savings and payment alternative, but fiat liquidity becomes less reliable.",
+      "riskMood": "risk_off",
+      "baseline": {
+        "recessionRisk": 0.35,
+        "inflationFear": 0.25,
+        "cryptoSentiment": 0.52,
+        "regulationPressure": 0.22,
+        "mediaAttention": 0.35,
+        "bankingStress": 0.72
+      },
+      "effects": {
+        "monoDemandMultiplier": 1.45,
+        "divDemandMultiplier": 0.82,
+        "monoSellPressureMultiplier": 0.95,
+        "divSellPressureMultiplier": 1.2,
+        "liquidityMultiplier": 0.7,
+        "volatilityMultiplier": 1.75,
+        "trustRecoveryMultiplier": 0.82,
+        "adoptionQualityMultiplier": 1.06,
+        "fiatUsefulnessMultiplier": 0.68,
+        "scenarioFrequencyMultiplier": 1.5
+      },
+      "scenarioBias": {
+        "promotion_attention": 1,
+        "adoption": 1.3,
+        "dividend": 0.95,
+        "treasury_trust": 1.35,
+        "market_structure": 1.45,
+        "macro": 1.5,
+        "fiat_inflation": 1.35,
+        "regulation_political": 1.35,
+        "banking_financial": 2,
+        "competition_technology": 1
+      },
+      "warnings": [
+        "Mono demand may rise while treasury fiat support becomes less reliable.",
+        "Liquidity and fiat deployment capacity should be watched closely."
+      ]
+    },
+
+    "regulatory_pressure": {
+      "label": "Regulatory Pressure",
+      "description": "Political and legal attention increases. Demand quality may weaken, liquidity may fall, and fiat ramps may become less reliable.",
+      "riskMood": "risk_off",
+      "baseline": {
+        "recessionRisk": 0.18,
+        "inflationFear": 0.16,
+        "cryptoSentiment": 0.38,
+        "regulationPressure": 0.7,
+        "mediaAttention": 0.35,
+        "bankingStress": 0.22
+      },
+      "effects": {
+        "monoDemandMultiplier": 0.82,
+        "divDemandMultiplier": 0.62,
+        "monoSellPressureMultiplier": 1.35,
+        "divSellPressureMultiplier": 1.65,
+        "liquidityMultiplier": 0.65,
+        "volatilityMultiplier": 1.8,
+        "trustRecoveryMultiplier": 0.7,
+        "adoptionQualityMultiplier": 0.82,
+        "fiatUsefulnessMultiplier": 0.88,
+        "scenarioFrequencyMultiplier": 1.55
+      },
+      "scenarioBias": {
+        "promotion_attention": 0.8,
+        "adoption": 0.65,
+        "dividend": 0.85,
+        "treasury_trust": 1.6,
+        "market_structure": 1.4,
+        "macro": 1.1,
+        "fiat_inflation": 1,
+        "regulation_political": 2.2,
+        "banking_financial": 1.3,
+        "competition_technology": 1.15
+      },
+      "warnings": [
+        "Regulatory pressure can make fiat reserves harder to deploy.",
+        "Liquidity trust and adoption trust are likely to weaken.",
+        "Government resistance can rise if fiat displacement is already high."
+      ]
+    },
+
+    "treasury_stress": {
+      "label": "Treasury Stress",
+      "description": "The treasury's ability to support policy is being questioned. This regime can be triggered by low inventory, weak fiat usefulness, or failed execution.",
+      "riskMood": "risk_off",
+      "baseline": {
+        "recessionRisk": 0.22,
+        "inflationFear": 0.2,
+        "cryptoSentiment": 0.42,
+        "regulationPressure": 0.25,
+        "mediaAttention": 0.28,
+        "bankingStress": 0.25
+      },
+      "effects": {
+        "monoDemandMultiplier": 0.88,
+        "divDemandMultiplier": 0.72,
+        "monoSellPressureMultiplier": 1.45,
+        "divSellPressureMultiplier": 1.6,
+        "liquidityMultiplier": 0.62,
+        "volatilityMultiplier": 1.9,
+        "trustRecoveryMultiplier": 0.65,
+        "adoptionQualityMultiplier": 0.85,
+        "fiatUsefulnessMultiplier": 0.9,
+        "scenarioFrequencyMultiplier": 1.65
+      },
+      "scenarioBias": {
+        "promotion_attention": 0.85,
+        "adoption": 0.75,
+        "dividend": 1.25,
+        "treasury_trust": 2.1,
+        "market_structure": 1.6,
+        "macro": 1.2,
+        "fiat_inflation": 1.1,
+        "regulation_political": 1.35,
+        "banking_financial": 1.35,
+        "competition_technology": 1.05
+      },
+      "warnings": [
+        "Treasury stress can quickly become a run-risk regime.",
+        "Coin inventory and liquid fiat support matter more than headline fiat value.",
+        "Trust recovery should be slow after visible support failure."
+      ]
+    },
+
+    "monetary_transition": {
+      "label": "Monetary Transition",
+      "description": "Mono and DIV are becoming meaningful competitors to fiat functions. Growth is strong, but political resistance rises.",
+      "riskMood": "neutral",
+      "baseline": {
+        "recessionRisk": 0.2,
+        "inflationFear": 0.35,
+        "cryptoSentiment": 0.62,
+        "regulationPressure": 0.42,
+        "mediaAttention": 0.45,
+        "bankingStress": 0.25
+      },
+      "effects": {
+        "monoDemandMultiplier": 1.45,
+        "divDemandMultiplier": 1.2,
+        "monoSellPressureMultiplier": 1.05,
+        "divSellPressureMultiplier": 1.12,
+        "liquidityMultiplier": 0.92,
+        "volatilityMultiplier": 1.45,
+        "trustRecoveryMultiplier": 0.9,
+        "adoptionQualityMultiplier": 1.08,
+        "fiatUsefulnessMultiplier": 0.72,
+        "scenarioFrequencyMultiplier": 1.55
+      },
+      "scenarioBias": {
+        "promotion_attention": 1.25,
+        "adoption": 1.55,
+        "dividend": 1.15,
+        "treasury_trust": 1.35,
+        "market_structure": 1.35,
+        "macro": 1.3,
+        "fiat_inflation": 1.5,
+        "regulation_political": 2,
+        "banking_financial": 1.4,
+        "competition_technology": 1.25
+      },
+      "warnings": [
+        "The system is large enough to provoke political resistance.",
+        "Fiat usefulness can decline while fiat liquidity remains operational.",
+        "Unit-of-account adoption becomes the key bottleneck."
+      ]
+    },
+
+    "systemic_crisis": {
+      "label": "Systemic Crisis",
+      "description": "Multiple stress channels are active at once. Liquidity is fragile, trust can fall quickly, and treasury execution is heavily tested.",
+      "riskMood": "risk_off",
+      "baseline": {
+        "recessionRisk": 0.7,
+        "inflationFear": 0.55,
+        "cryptoSentiment": 0.28,
+        "regulationPressure": 0.65,
+        "mediaAttention": 0.65,
+        "bankingStress": 0.75
+      },
+      "effects": {
+        "monoDemandMultiplier": 0.92,
+        "divDemandMultiplier": 0.48,
+        "monoSellPressureMultiplier": 1.75,
+        "divSellPressureMultiplier": 2.2,
+        "liquidityMultiplier": 0.42,
+        "volatilityMultiplier": 2.6,
+        "trustRecoveryMultiplier": 0.45,
+        "adoptionQualityMultiplier": 0.7,
+        "fiatUsefulnessMultiplier": 0.55,
+        "scenarioFrequencyMultiplier": 2.4
+      },
+      "scenarioBias": {
+        "promotion_attention": 0.5,
+        "adoption": 0.6,
+        "dividend": 1.25,
+        "treasury_trust": 2.4,
+        "market_structure": 2.1,
+        "macro": 2.2,
+        "fiat_inflation": 1.8,
+        "regulation_political": 2.1,
+        "banking_financial": 2.4,
+        "competition_technology": 1.15
+      },
+      "warnings": [
+        "This is a severe stress regime.",
+        "Treasury execution, fiat liquidity, and coin inventory are all likely to be tested.",
+        "Trust should recover slowly after this regime."
+      ]
+    }
+  },
+
+  "transitionRules": {
+    "risk_on_expansion": {
+      "enterWhen": {
+        "cryptoSentiment": { "min": 0.6 },
+        "recessionRisk": { "max": 0.2 },
+        "bankingStress": { "max": 0.2 }
+      }
+    },
+    "crypto_euphoria": {
+      "enterWhen": {
+        "cryptoSentiment": { "min": 0.7 },
+        "mediaAttention": { "min": 0.4 }
+      }
+    },
+    "risk_off": {
+      "enterWhen": {
+        "cryptoSentiment": { "max": 0.35 }
+      }
+    },
+    "recession_fear": {
+      "enterWhen": {
+        "recessionRisk": { "min": 0.55 }
+      }
+    },
+    "inflation_fear": {
+      "enterWhen": {
+        "inflationFear": { "min": 0.6 }
+      }
+    },
+    "banking_stress": {
+      "enterWhen": {
+        "bankingStress": { "min": 0.55 }
+      }
+    },
+    "regulatory_pressure": {
+      "enterWhen": {
+        "regulationPressure": { "min": 0.55 }
+      }
+    },
+    "treasury_stress": {
+      "enterWhen": {
+        "treasuryControlScore": { "max": 45 },
+        "systemicTrust": { "max": 50 }
+      }
+    },
+    "monetary_transition": {
+      "enterWhen": {
+        "fiatDisplacementIndex": { "min": 45 },
+        "systemicTrust": { "min": 45 }
+      }
+    },
+    "systemic_crisis": {
+      "enterWhen": {
+        "panicRisk": { "min": 0.5 },
+        "systemicTrust": { "max": 35 }
+      }
+    }
+  },
+
+  "engineNotes": {
+    "regimeSelection": "The scenario engine may calculate the current regime from market variables instead of loading this file directly in v1.",
+    "regimeEffects": "Regime effects should be multipliers or biases. They should not directly overwrite balance sheets.",
+    "multipleSignals": "When several regime signals are active, crisis and stress regimes should dominate calm regimes.",
+    "meanReversion": "Macro variables should slowly drift back toward calm_expansion baselines unless scenarios or endogenous conditions keep them elevated.",
+    "playerImpact": "The player cannot choose the regime directly, but treasury policy can make some regimes easier or harder to survive."
+  }
+}
