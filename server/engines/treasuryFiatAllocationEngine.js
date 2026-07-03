@@ -1,5 +1,16 @@
 "use strict";
 
+const {
+  createInterestJournalEntry
+} = require("../journal");
+
+createInterestJournalEntry({
+  state,
+  interestUsd: interestReceived,
+  treasuryFiatUsd: state.treasury.fiat.totalUsdNominal
+});
+
+
 function runTreasuryFiatAllocationEngine(state, context = {}) {
   const tickContext = context.tickContext || {};
   const simulatedDays = Math.max(1, Number(tickContext.simulatedDays || 1));
