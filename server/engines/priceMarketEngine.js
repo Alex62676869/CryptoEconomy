@@ -1,552 +1,575 @@
 "use strict";
 
-journal: state.journal,
+const {
+  createTradeJournalEntry
+} = require("../journal");
 
-  journal: {
-  entries: []
-},
+function runPriceMarketEngine(state, context = {}) {
+  const tickContext = context.tickContext || {};
+  const simulatedDays = Number(tickContext.simulatedDays || 1);
 
-function createInitialState() {
-  const now = Date.now();
+  updateAssetPrice({
+    state,
+    asset: "mono",
+    simulatedDays
+  });
 
-  return {
-    meta: {
-      version: "1.0.0",
-      createdAt: now,
-      updatedAt: now,
-      name: "Mono & DIV Economy Game"
-    },
+  updateAssetPrice({
+    state,
+    asset: "div",
+    simulatedDays
+  });
 
-    runtime: {
-      tick: 0,
-      simulatedDay: 0,
-      lastTickAt: now,
-      lastPlayerActionAt: null,
-      lastDefaultsUpdateAt: null,
-      lastConnectionChangeAt: null,
-      isPlayerOnline: false
-    },
+  updateDivTopPointPressure(state);
+  addPriceChartPoints(state);
 
-    defaults: createDefaultSettings(),
-
-    policy: createInitialPolicy(),
-
-    prices: {
-      mono: {
-        market: 1.0,
-        previousMarket: 1.0,
-        fundamental: 1.0,
-        policyMidpoint: 1.0,
-        returnThisTick: 0,
-        momentum: 0,
-        overheatingScore: 0
-      },
-
-      div: {
-        market: 1.0,
-        previousMarket: 1.0,
-        fundamental: 1.0,
-        policyMidpoint: 1.0,
-        returnThisTick: 0,
-        momentum: 0,
-        overheatingScore: 0,
-        topPointPressure: 0
-      }
-    },
-
-    treasury: {
-      fiat: {
-        totalUsdNominal: 1_000_000,
-        totalUsdReal: 1_000_000,
-        liquidSupportUsd: 1_000_000,
-        blendedNominalYield: 0.035,
-        blendedUsdAdjustedReturn: 0.025,
-        blendedRealReturn: 0.015,
-        fiatUsefulnessScore: 100,
-        globalM2Share: 0,
-        allocationMode: "balanced"
-      },
-
-      mono: {
-        balance: 100_000_000_000_000,
-        strategicReserveTarget: 30_000_000_000_000,
-        controlScore: 100,
-        inventoryZone: "excellent"
-      },
-
-      div: {
-        balance: 100_000_000_000_000,
-        strategicReserveTarget: 30_000_000_000_000,
-        controlScore: 100,
-        inventoryZone: "excellent"
-      },
-
-      controlScore: 100,
-      supportCapacityScore: 100,
-      absorptionCapacityScore: 100,
-      executionQuality: 100
-    },
-
-    circulation: {
-      mono: {
-        supply: 300_000,
-        usdValue: 300_000
-      },
-
-      div: {
-        supply: 300_000,
-        usdValue: 300_000
-      }
-    },
-
-    fiatCurrencies: createInitialCurrencyAccounts(),
-
-    market: {
-      mono: {
-        desiredBuyUsd: 0,
-        desiredSellCoins: 0,
-        executedBuyUsd: 0,
-        executedSellCoins: 0,
-        publicDemand: 0,
-        publicSellPressure: 0,
-        orderFlowImbalance: 0,
-        liquidity: 75,
-        volatility: 0.02,
-        marketDepthUsd: 1_000_000,
-        arbitragePressure: 0,
-        supportPressure: 0
-      },
-
-      div: {
-        desiredBuyUsd: 0,
-        desiredSellCoins: 0,
-        executedBuyUsd: 0,
-        executedSellCoins: 0,
-        publicDemand: 0,
-        publicSellPressure: 0,
-        orderFlowImbalance: 0,
-        liquidity: 65,
-        volatility: 0.04,
-        marketDepthUsd: 750_000,
-        arbitragePressure: 0,
-        topPointPressure: 0
-      },
-
-      regime: {
-        name: "calm_expansion",
-        riskMood: "neutral",
-        recessionRisk: 0.05,
-        inflationFear: 0.1,
-        cryptoSentiment: 0.5,
-        regulationPressure: 0.05,
-        mediaAttention: 0.05,
-        bankingStress: 0.03
-      }
-    },
-
-    adoption: {
-      mono: {
-        potentialUsers: 1_000_000_000,
-        awareUsers: 10_000,
-        trialUsers: 1_000,
-        activeUsers: 300,
-        stickyUsers: 100,
-        merchants: 10,
-        businesses: 1,
-        institutions: 0,
-        paymentAdoption: 0,
-        savingsAdoption: 0,
-        settlementAdoption: 0,
-        reserveAdoption: 0,
-        unitOfAccountAdoption: 0,
-        churnRate: 0.01,
-        adoptionQuality: 50
-      },
-
-      div: {
-        awareUsers: 10_000,
-        holders: 300,
-        stickyHolders: 50,
-        dividendSeekers: 50,
-        speculators: 200,
-        institutions: 0,
-        speculativeDemandShare: 0.6,
-        churnRate: 0.02,
-        adoptionQuality: 40
-      },
-
-      flows: {
-        awarenessGrowth: 0,
-        trialGrowth: 0,
-        activeGrowth: 0,
-        stickyGrowth: 0,
-        merchantGrowth: 0,
-        businessGrowth: 0,
-        institutionalGrowth: 0,
-        churn: 0
-      }
-    },
-
-    confidence: {
-      systemicTrust: 75,
-      monoStabilityTrust: 80,
-      divDividendTrust: 65,
-      treasuryInventoryTrust: 100,
-      treasuryFiatTrust: 80,
-      policyConsistencyTrust: 80,
-      liquidityTrust: 75,
-      adoptionTrust: 55,
-      regulatorySurvivalTrust: 70,
-      runRisk: 0,
-      panicRisk: 0,
-      trustRegime: "normal",
-      trend: "stable",
-      mainDrivers: [],
-      mainRisks: []
-    },
-
-    dividends: {
-      enabled: true,
-      automationEnabled: false,
-      targetAnnualDivDistribution: 0,
-      distributedLast365Days: 0,
-      sustainabilityScore: 100,
-      expectationScore: 25,
-      lastDistributionTick: null,
-      nextScheduledDistributionTick: null
-    },
-
-    fiatDisplacement: {
-      index: 0,
-      stage: "fiat_dominant",
-      fiatUsefulnessScore: 100,
-      savingsAdoption: 0,
-      paymentAdoption: 0,
-      merchantAdoption: 0,
-      businessSettlementAdoption: 0,
-      unitOfAccountAdoption: 0,
-      reserveAdoption: 0,
-      treasuryFiatDependence: 100,
-      governmentResistanceLevel: 0,
-      bankingFrictionLevel: 0,
-      realFiatPurchasingPower: 100,
-      globalM2Share: 0
-    },
-
-    scenarios: {
-      active: [],
-      history: [],
-      lastRolledAtTick: null,
-      currentRegime: "calm_expansion",
-      scenarioPressure: 0,
-      aftershockPressure: 0,
-      clusteringPressure: 0
-    },
-
-    warnings: [],
-
-    explanations: {
-      latest: [],
-      history: []
-    },
-
-    charts: {
-      monoPrice: [],
-      divPrice: [],
-      treasuryFiat: [],
-      treasuryMono: [],
-      treasuryDiv: [],
-      systemicTrust: [],
-      fiatDisplacement: []
-    },
-
-    history: {
-      events: [],
-      snapshots: []
-    }
-  };
+  return state;
 }
 
-function createDefaultSettings() {
-  return {
-    difficulty: "normal",
-    adoptionMode: "normal",
-    modelPreset: "balanced_realism",
+function updateAssetPrice({ state, asset, simulatedDays }) {
+  const priceState = state.prices[asset];
+  const marketState = state.market[asset];
 
-    treasuryCapMode: "global_scale",
-    treasuryFiatCapUsd: 100_000_000_000_000,
+  const previousPrice = Math.max(0.000001, Number(priceState.market || 1));
+  const fundamental = calculateFundamentalPrice({ state, asset });
 
-    offlineSimulation: {
-      mode: "unlimited",
-      maxCatchupTicks: 10_000
-    },
+  priceState.previousMarket = previousPrice;
+  priceState.fundamental = fundamental;
 
-    tickSpeed: {
-      tickMs: 1000,
-      simulatedDaysPerTick: 1
-    },
+  const scenarioImpact = getScenarioPriceImpact({ state, asset });
+  const difficultyParams = getDifficultyParams(state);
 
-    scenarios: {
-      frequency: "normal",
-      intensity: "normal"
-    },
+  const fundamentalPull = calculateFundamentalPull({
+    price: previousPrice,
+    fundamental,
+    asset
+  });
 
-    startingValues: {
-      treasuryFiatUsd: 1_000_000,
-      treasuryMono: 100_000_000_000_000,
-      treasuryDiv: 100_000_000_000_000,
-      circulatingMonoUsdValue: 300_000,
-      circulatingDivUsdValue: 300_000
-    },
+  const orderFlowPressure = calculateOrderFlowPressure({
+    state,
+    asset,
+    price: previousPrice
+  });
 
-    strategicReserveTargets: {
-      mono: 30_000_000_000_000,
-      div: 30_000_000_000_000
-    },
+  const momentumPressure = calculateMomentumPressure({
+    state,
+    asset
+  });
 
-    difficultyParams: {
-      sandbox: {
-        scenarioFrequencyMultiplier: 0.35,
-        scenarioIntensityMultiplier: 0.4,
-        volatilityMultiplier: 0.5,
-        arbitrageAggression: 0.25,
-        panicMultiplier: 0.25,
-        trustRecoveryMultiplier: 1.6,
-        regulatoryPressureMultiplier: 0.25
-      },
+  const volatilityShock = calculateVolatilityShock({
+    volatility: marketState.volatility,
+    difficultyMultiplier: difficultyParams.volatilityMultiplier
+  });
 
-      normal: {
-        scenarioFrequencyMultiplier: 1,
-        scenarioIntensityMultiplier: 1,
-        volatilityMultiplier: 1,
-        arbitrageAggression: 1,
-        panicMultiplier: 1,
-        trustRecoveryMultiplier: 1,
-        regulatoryPressureMultiplier: 1
-      },
+  const scenarioShock = scenarioImpact.priceShock;
 
-      hard: {
-        scenarioFrequencyMultiplier: 1.75,
-        scenarioIntensityMultiplier: 1.35,
-        volatilityMultiplier: 1.35,
-        arbitrageAggression: 1.5,
-        panicMultiplier: 1.4,
-        trustRecoveryMultiplier: 0.8,
-        regulatoryPressureMultiplier: 1.4
-      },
+  const rawReturn =
+    fundamentalPull +
+    orderFlowPressure +
+    momentumPressure +
+    scenarioShock +
+    volatilityShock;
 
-      brutal: {
-        scenarioFrequencyMultiplier: 2.75,
-        scenarioIntensityMultiplier: 1.85,
-        volatilityMultiplier: 1.8,
-        arbitrageAggression: 2.2,
-        panicMultiplier: 2,
-        trustRecoveryMultiplier: 0.6,
-        regulatoryPressureMultiplier: 2
-      },
+  const maxReturn = asset === "mono" ? 0.08 : 0.18;
+  const boundedReturn = clamp(rawReturn, -maxReturn, maxReturn);
 
-      historical_chaos: {
-        scenarioFrequencyMultiplier: 4,
-        scenarioIntensityMultiplier: 2.5,
-        volatilityMultiplier: 2.5,
-        arbitrageAggression: 3,
-        panicMultiplier: 3,
-        trustRecoveryMultiplier: 0.4,
-        regulatoryPressureMultiplier: 3
-      }
-    },
+  const nextPrice = Math.max(
+    0.000001,
+    previousPrice * Math.exp(boundedReturn)
+  );
 
-    adoptionModes: {
-      low: {
-        awarenessMultiplier: 0.5,
-        trialMultiplier: 0.5,
-        stickyAdoptionMultiplier: 0.65,
-        speculationMultiplier: 0.65,
-        regulatoryAttentionMultiplier: 0.75
-      },
+  priceState.market = nextPrice;
+  priceState.returnThisTick = boundedReturn;
+  priceState.momentum = updateMomentum({
+    previousMomentum: priceState.momentum,
+    latestReturn: boundedReturn
+  });
 
-      normal: {
-        awarenessMultiplier: 1,
-        trialMultiplier: 1,
-        stickyAdoptionMultiplier: 1,
-        speculationMultiplier: 1,
-        regulatoryAttentionMultiplier: 1
-      },
+  updateMarketMicrostructure({
+    state,
+    asset,
+    price: nextPrice,
+    returnThisTick: boundedReturn,
+    scenarioImpact,
+    simulatedDays,
+    difficultyParams
+  });
 
-      high: {
-        awarenessMultiplier: 1.8,
-        trialMultiplier: 1.8,
-        stickyAdoptionMultiplier: 1.35,
-        speculationMultiplier: 1.8,
-        regulatoryAttentionMultiplier: 1.4
-      },
-
-      hyper: {
-        awarenessMultiplier: 3,
-        trialMultiplier: 3,
-        stickyAdoptionMultiplier: 1.8,
-        speculationMultiplier: 3.5,
-        regulatoryAttentionMultiplier: 2.2
-      }
-    }
-  };
+  journalPeerTrade({
+    state,
+    asset,
+    price: nextPrice
+  });
 }
 
-function createInitialPolicy() {
-  return {
-    mono: {
-      buyPoint: 0.99,
-      sellPoint: 1.01,
-      listedSupply: 1_000_000,
-      buybackBudgetUsd: 0,
-      autoBuybackEnabled: true
-    },
+function journalPeerTrade({ state, asset, price }) {
+  const marketState = state.market[asset];
 
-    div: {
-      buyPoint: 0.99,
-      sellPoint: 1.01,
-      floor: 0.99,
-      topPoint: 1.25,
-      listedSupply: 1_000_000,
-      buybackBudgetUsd: 0,
-      autoBuybackEnabled: false,
-      annualGrowthTarget: 0.1
-    },
+  const unfilledBuyUsd = Math.max(
+    0,
+    Number(marketState.desiredBuyUsd || 0) - Number(marketState.executedBuyUsd || 0)
+  );
 
-    dividends: {
-      enabled: true,
-      automationEnabled: false,
-      targetAnnualDivDistribution: 0,
-      maxDistributionPerTick: 0
-    },
+  const unfilledSellCoins = Math.max(
+    0,
+    Number(marketState.desiredSellCoins || 0) - Number(marketState.executedSellCoins || 0)
+  );
 
-    treasury: {
-      allocationMode: "balanced",
-      preserveStrategicReserves: true,
-      minMonoReserve: 30_000_000_000_000,
-      minDivReserve: 30_000_000_000_000
-    }
-  };
-}
+  const peerCoins = Math.min(
+    unfilledSellCoins,
+    unfilledBuyUsd / Math.max(0.000001, price)
+  );
 
-function createInitialCurrencyAccounts() {
-  const currencies = [
-    ["USD", "United States", 0.035, 0.025, 0.0, 95, 100, 100],
-    ["EUR", "Euro Area", 0.025, 0.02, 0.005, 88, 90, 90],
-    ["JPY", "Japan", 0.005, 0.015, 0.005, 90, 80, 85],
-    ["GBP", "United Kingdom", 0.035, 0.025, 0.005, 88, 75, 85],
-    ["CHF", "Switzerland", 0.01, 0.015, -0.002, 96, 45, 90],
-    ["CAD", "Canada", 0.03, 0.02, 0.005, 88, 70, 85],
-    ["AUD", "Australia", 0.035, 0.025, 0.006, 86, 65, 82],
-    ["NZD", "New Zealand", 0.04, 0.025, 0.008, 84, 35, 78],
-    ["SGD", "Singapore", 0.03, 0.02, 0.002, 92, 45, 88],
-    ["HKD", "Hong Kong", 0.035, 0.025, 0.003, 76, 45, 78],
+  const peerUsd = peerCoins * price;
 
-    ["NOK", "Norway", 0.035, 0.025, 0.008, 88, 35, 82],
-    ["SEK", "Sweden", 0.03, 0.025, 0.008, 86, 45, 82],
-    ["DKK", "Denmark", 0.025, 0.02, 0.004, 88, 35, 84],
-    ["KRW", "South Korea", 0.035, 0.025, 0.012, 78, 60, 74],
-    ["PLN", "Poland", 0.05, 0.035, 0.018, 74, 35, 68],
-    ["CZK", "Czech Republic", 0.045, 0.03, 0.015, 76, 25, 68],
-    ["ILS", "Israel", 0.035, 0.025, 0.012, 74, 25, 65],
-
-    ["CNY", "China", 0.025, 0.02, 0.015, 55, 95, 40],
-    ["INR", "India", 0.065, 0.045, 0.035, 58, 75, 48],
-    ["MXN", "Mexico", 0.08, 0.045, 0.035, 56, 45, 50],
-    ["BRL", "Brazil", 0.09, 0.055, 0.055, 50, 55, 45],
-    ["ZAR", "South Africa", 0.08, 0.05, 0.045, 52, 25, 48],
-    ["IDR", "Indonesia", 0.055, 0.035, 0.035, 52, 45, 42],
-    ["MYR", "Malaysia", 0.035, 0.025, 0.02, 62, 30, 55],
-    ["THB", "Thailand", 0.025, 0.02, 0.018, 62, 30, 55],
-    ["PHP", "Philippines", 0.055, 0.04, 0.035, 50, 25, 42],
-    ["CLP", "Chile", 0.065, 0.04, 0.035, 58, 20, 48],
-    ["COP", "Colombia", 0.085, 0.055, 0.05, 46, 20, 38],
-
-    ["AED", "United Arab Emirates", 0.035, 0.025, 0.003, 72, 35, 65],
-    ["SAR", "Saudi Arabia", 0.035, 0.025, 0.004, 70, 45, 62]
-  ];
-
-  const accounts = {};
-
-  for (const [
-    code,
-    region,
-    nominalYield,
-    inflation,
-    expectedFxDecay,
-    trustScore,
-    depthScore,
-    liquidityScore
-  ] of currencies) {
-    accounts[code] = {
-      code,
-      region,
-      localBalance: code === "USD" ? 1_000_000 : 0,
-      usdEquivalent: code === "USD" ? 1_000_000 : 0,
-      nominalYield,
-      inflation,
-      expectedFxDecay,
-      effectiveUsdReturn: nominalYield - expectedFxDecay,
-      realReturn: nominalYield - inflation - expectedFxDecay,
-      trustScore,
-      bankingDepthScore: depthScore,
-      gdpDepthScore: depthScore,
-      liquidityScore,
-      capitalControlPenalty: code === "CNY" ? 35 : 0,
-      saturationLevel: 0,
-      localM2Share: 0,
-      riskWarning: null
-    };
+  if (peerCoins <= 0 || peerUsd < 100) {
+    return;
   }
 
-  return accounts;
+  createTradeJournalEntry({
+    state,
+    category: "peer",
+    source: "Peer",
+    asset,
+    action: "peer_sold",
+    amount: peerCoins,
+    usd: peerUsd
+  });
 }
 
-function createPublicState(state) {
+function calculateFundamentalPrice({ state, asset }) {
+  if (asset === "mono") {
+    return calculateMonoFundamental(state);
+  }
+
+  return calculateDivFundamental(state);
+}
+
+function calculateMonoFundamental(state) {
+  const policyMidpoint = Math.max(0.000001, state.prices.mono.policyMidpoint || 1);
+
+  const paymentAdoption = percentToUnit(state.adoption.mono.paymentAdoption);
+  const savingsAdoption = percentToUnit(state.adoption.mono.savingsAdoption);
+  const unitOfAccountAdoption = percentToUnit(state.adoption.mono.unitOfAccountAdoption);
+  const fiatDisplacement = percentToUnit(state.fiatDisplacement.index);
+  const stabilityTrust = percentToUnit(state.confidence.monoStabilityTrust);
+  const treasuryTrust = percentToUnit(state.confidence.treasuryInventoryTrust);
+  const fiatTrust = percentToUnit(state.confidence.treasuryFiatTrust);
+  const liquidityTrust = percentToUnit(state.confidence.liquidityTrust);
+  const dividendExpectation = percentToUnit(state.dividends.expectationScore);
+
+  const volatilityPenalty = clamp(state.market.mono.volatility * 3, 0, 0.5);
+  const regulationPenalty = clamp(state.market.regime.regulationPressure * 0.3, 0, 0.4);
+  const reservePenalty = 1 - percentToUnit(state.treasury.mono.controlScore);
+
+  const premium =
+    paymentAdoption * 0.12 +
+    savingsAdoption * 0.12 +
+    unitOfAccountAdoption * 0.18 +
+    fiatDisplacement * 0.18 +
+    stabilityTrust * 0.08 +
+    treasuryTrust * 0.06 +
+    fiatTrust * 0.04 +
+    liquidityTrust * 0.04 +
+    dividendExpectation * 0.04;
+
+  const penalty =
+    volatilityPenalty +
+    regulationPenalty +
+    reservePenalty * 0.25;
+
+  return Math.max(
+    0.000001,
+    policyMidpoint * (1 + premium - penalty)
+  );
+}
+
+function calculateDivFundamental(state) {
+  const policyMidpoint = Math.max(0.000001, state.prices.div.policyMidpoint || 1);
+
+  const dividendExpectation = percentToUnit(state.dividends.expectationScore);
+  const dividendTrust = percentToUnit(state.confidence.divDividendTrust);
+  const adoptionGrowth = calculateAdoptionGrowthSignal(state);
+  const fiatDisplacement = percentToUnit(state.fiatDisplacement.index);
+  const treasuryTrust = percentToUnit(state.confidence.treasuryInventoryTrust);
+  const scarcityValue = calculateDivScarcityValue(state);
+  const speculativeShare = clamp(state.adoption.div.speculativeDemandShare || 0, 0, 1);
+  const liquidityTrust = percentToUnit(state.confidence.liquidityTrust);
+
+  const volatilityPenalty = clamp(state.market.div.volatility * 2.5, 0, 0.7);
+  const overheatingPenalty = percentToUnit(state.prices.div.overheatingScore) * 0.45;
+  const inventoryPenalty = 1 - percentToUnit(state.treasury.div.controlScore);
+  const regulationPenalty = clamp(state.market.regime.regulationPressure * 0.35, 0, 0.5);
+
+  const premium =
+    dividendExpectation * 0.24 +
+    dividendTrust * 0.12 +
+    adoptionGrowth * 0.2 +
+    fiatDisplacement * 0.18 +
+    treasuryTrust * 0.06 +
+    scarcityValue * 0.1 +
+    speculativeShare * 0.08 +
+    liquidityTrust * 0.04;
+
+  const penalty =
+    volatilityPenalty +
+    overheatingPenalty +
+    inventoryPenalty * 0.3 +
+    regulationPenalty;
+
+  return Math.max(
+    0.000001,
+    policyMidpoint * (1 + premium - penalty)
+  );
+}
+
+function calculateFundamentalPull({ price, fundamental, asset }) {
+  const speed = asset === "mono" ? 0.025 : 0.04;
+
+  const logGap = Math.log(Math.max(0.000001, fundamental) / Math.max(0.000001, price));
+
+  return clamp(logGap * speed, -0.04, 0.04);
+}
+
+function calculateOrderFlowPressure({ state, asset, price }) {
+  const marketState = state.market[asset];
+
+  const unfilledBuyUsd = Math.max(
+    0,
+    (marketState.desiredBuyUsd || 0) - (marketState.executedBuyUsd || 0)
+  );
+
+  const unfilledSellCoins = Math.max(
+    0,
+    (marketState.desiredSellCoins || 0) - (marketState.executedSellCoins || 0)
+  );
+
+  const unfilledSellUsd = unfilledSellCoins * price;
+
+  const executedBuyUsd = Math.max(0, marketState.executedBuyUsd || 0);
+  const executedSellUsd = Math.max(0, marketState.executedSellCoins || 0) * price;
+
+  const netPressureUsd =
+    unfilledBuyUsd -
+    unfilledSellUsd +
+    (executedBuyUsd - executedSellUsd) * 0.25;
+
+  const marketDepth = Math.max(1, marketState.marketDepthUsd || 1);
+
+  marketState.orderFlowImbalance = netPressureUsd;
+
+  const impactCoefficient = asset === "mono" ? 0.035 : 0.075;
+
+  return clamp(
+    impactCoefficient * (netPressureUsd / marketDepth),
+    asset === "mono" ? -0.05 : -0.12,
+    asset === "mono" ? 0.05 : 0.12
+  );
+}
+
+function calculateMomentumPressure({ state, asset }) {
+  const momentum = Number(state.prices[asset].momentum || 0);
+  const speculativeWeight =
+    asset === "div"
+      ? 0.04 + clamp(state.adoption.div.speculativeDemandShare || 0, 0, 1) * 0.04
+      : 0.015;
+
+  return clamp(momentum * speculativeWeight, -0.04, 0.06);
+}
+
+function calculateVolatilityShock({ volatility, difficultyMultiplier }) {
+  const sigma = Math.max(0, Number(volatility || 0)) * Math.max(0, difficultyMultiplier || 1);
+
+  const pseudoNormal =
+    Math.random() +
+    Math.random() +
+    Math.random() +
+    Math.random() -
+    2;
+
+  return clamp(pseudoNormal * sigma * 0.18, -0.08, 0.08);
+}
+
+function updateMomentum({ previousMomentum, latestReturn }) {
+  return clamp(
+    Number(previousMomentum || 0) * 0.88 + Number(latestReturn || 0) * 0.12,
+    -1,
+    1
+  );
+}
+
+function updateMarketMicrostructure({
+  state,
+  asset,
+  price,
+  returnThisTick,
+  scenarioImpact,
+  simulatedDays,
+  difficultyParams
+}) {
+  const marketState = state.market[asset];
+
+  const absoluteReturn = Math.abs(returnThisTick);
+  const confidence = percentToUnit(state.confidence.systemicTrust);
+  const liquidityTrust = percentToUnit(state.confidence.liquidityTrust);
+  const inventoryControl = percentToUnit(state.treasury[asset].controlScore);
+  const volatilityMultiplier = difficultyParams.volatilityMultiplier || 1;
+
+  const baseVolatility = asset === "mono" ? 0.012 : 0.028;
+
+  const volatilityFromReturn = absoluteReturn * 0.45;
+  const volatilityFromScenario = Math.abs(scenarioImpact.volatilityShock || 0) * 0.25;
+  const volatilityFromLowLiquidity = (1 - liquidityTrust) * 0.025;
+  const volatilityFromLowConfidence = (1 - confidence) * 0.03;
+  const volatilityFromInventoryDanger = (1 - inventoryControl) * 0.035;
+
+  const targetVolatility =
+    baseVolatility +
+    volatilityFromReturn +
+    volatilityFromScenario +
+    volatilityFromLowLiquidity +
+    volatilityFromLowConfidence +
+    volatilityFromInventoryDanger;
+
+  marketState.volatility = clamp(
+    marketState.volatility * 0.88 +
+      targetVolatility * 0.12 * volatilityMultiplier,
+    asset === "mono" ? 0.002 : 0.005,
+    asset === "mono" ? 0.25 : 0.6
+  );
+
+  const liquidityChange =
+    confidence * 1.2 +
+    liquidityTrust * 1.1 +
+    inventoryControl * 1.1 -
+    marketState.volatility * 80 -
+    Math.abs(marketState.orderFlowImbalance || 0) / Math.max(1, marketState.marketDepthUsd) * 12 +
+    (scenarioImpact.liquidityShock || 0) * 10;
+
+  marketState.liquidity = clamp(
+    marketState.liquidity + liquidityChange * 0.025 * Math.max(1, simulatedDays),
+    1,
+    100
+  );
+
+  const circulationUsd =
+    asset === "mono"
+      ? state.circulation.mono.supply * price
+      : state.circulation.div.supply * price;
+
+  const treasuryListedSupplyUsd = Math.max(0, state.policy[asset].listedSupply || 0) * price;
+  const treasuryDepthSupport = treasuryListedSupplyUsd * (inventoryControl * 0.25);
+  const liquidityDepth = Math.max(10_000, circulationUsd * 0.08 * (marketState.liquidity / 100));
+
+  marketState.marketDepthUsd = Math.max(
+    10_000,
+    liquidityDepth + treasuryDepthSupport + state.treasury.fiat.liquidSupportUsd * 0.01
+  );
+
+  marketState.supportPressure = calculateSupportPressure({
+    state,
+    asset,
+    price
+  });
+
+  marketState.arbitragePressure = calculateArbitragePressure({
+    state,
+    asset,
+    price
+  });
+}
+
+function calculateSupportPressure({ state, asset, price }) {
+  const policy = state.policy[asset];
+  const buyPoint = Math.max(0.000001, policy.buyPoint);
+
+  if (price >= buyPoint) {
+    return clamp((buyPoint / price - 0.98) * 5, 0, 1);
+  }
+
+  return clamp((buyPoint - price) / buyPoint, 0, 1);
+}
+
+function calculateArbitragePressure({ state, asset, price }) {
+  const policy = state.policy[asset];
+
+  const buyPoint = Math.max(0.000001, policy.buyPoint);
+  const sellPoint = Math.max(0.000001, policy.sellPoint);
+  const spread = Math.max(0, sellPoint - buyPoint);
+  const midpoint = (buyPoint + sellPoint) / 2;
+
+  const spreadRatio = midpoint > 0 ? spread / midpoint : 1;
+  const volatility = state.market[asset].volatility;
+  const confidencePenalty = 1 - percentToUnit(state.confidence.policyConsistencyTrust);
+
+  const tooTightSpreadPressure = spreadRatio < volatility * 1.5
+    ? 1 - spreadRatio / Math.max(0.000001, volatility * 1.5)
+    : 0;
+
+  const mispricingPressure =
+    price < buyPoint
+      ? clamp((buyPoint - price) / buyPoint, 0, 1)
+      : price > sellPoint
+        ? clamp((price - sellPoint) / sellPoint, 0, 1)
+        : 0;
+
+  return clamp(
+    tooTightSpreadPressure * 0.45 +
+      mispricingPressure * 0.4 +
+      confidencePenalty * 0.15,
+    0,
+    1
+  );
+}
+
+function updateDivTopPointPressure(state) {
+  const divPrice = Math.max(0.000001, state.prices.div.market);
+  const topPoint = Math.max(0.000001, state.policy.div.topPoint);
+
+  const rawPressure = divPrice <= topPoint
+    ? 0
+    : (divPrice - topPoint) / topPoint;
+
+  const adoptionGrowth = calculateAdoptionGrowthSignal(state);
+  const speculativeShare = clamp(state.adoption.div.speculativeDemandShare || 0, 0, 1);
+  const divInventoryDanger = 1 - percentToUnit(state.treasury.div.controlScore);
+  const dividendExpectation = percentToUnit(state.dividends.expectationScore);
+
+  const overheatingScore = clamp(
+    rawPressure * 55 +
+      speculativeShare * 20 +
+      divInventoryDanger * 20 +
+      dividendExpectation * 5 -
+      adoptionGrowth * 10,
+    0,
+    100
+  );
+
+  state.prices.div.topPointPressure = clamp(rawPressure, 0, 10);
+  state.market.div.topPointPressure = state.prices.div.topPointPressure;
+  state.prices.div.overheatingScore = overheatingScore;
+}
+
+function calculateAdoptionGrowthSignal(state) {
+  const mono = state.adoption.mono;
+  const flows = state.adoption.flows;
+
+  const activeGrowthRate =
+    mono.activeUsers > 0
+      ? flows.activeGrowth / Math.max(1, mono.activeUsers)
+      : 0;
+
+  const merchantGrowthRate =
+    mono.merchants > 0
+      ? flows.merchantGrowth / Math.max(1, mono.merchants)
+      : 0;
+
+  const businessGrowthRate =
+    mono.businesses > 0
+      ? flows.businessGrowth / Math.max(1, mono.businesses)
+      : 0;
+
+  return clamp(
+    activeGrowthRate * 0.35 +
+      merchantGrowthRate * 0.35 +
+      businessGrowthRate * 0.3,
+    0,
+    1
+  );
+}
+
+function calculateDivScarcityValue(state) {
+  const divBalance = Math.max(0, state.treasury.div.balance || 0);
+  const totalDiv =
+    divBalance + Math.max(0, state.circulation.div.supply || 0);
+
+  if (totalDiv <= 0) return 0;
+
+  const treasuryShare = divBalance / totalDiv;
+
+  if (treasuryShare > 0.7) return 0.05;
+  if (treasuryShare > 0.5) return 0.1;
+  if (treasuryShare > 0.3) return 0.18;
+  if (treasuryShare > 0.1) return 0.08;
+
+  return 0;
+}
+
+function getScenarioPriceImpact({ state, asset }) {
+  const output = {
+    priceShock: 0,
+    volatilityShock: 0,
+    liquidityShock: 0
+  };
+
+  for (const scenario of state.scenarios.active || []) {
+    const effects = scenario.effects || {};
+    const assetEffects = effects[asset] || {};
+
+    output.priceShock += Number(assetEffects.priceShock || 0);
+    output.volatilityShock += Number(assetEffects.volatilityShock || 0);
+    output.liquidityShock += Number(assetEffects.liquidityShock || 0);
+
+    if (asset === "mono") {
+      output.priceShock += Number(effects.monoDemandImpact || 0) * 0.001;
+      output.priceShock -= Number(effects.monoSellPressureImpact || 0) * 0.001;
+    }
+
+    if (asset === "div") {
+      output.priceShock += Number(effects.divDemandImpact || 0) * 0.001;
+      output.priceShock -= Number(effects.divSellPressureImpact || 0) * 0.001;
+    }
+
+    output.volatilityShock += Number(effects.volatilityImpact || 0) * 0.001;
+    output.liquidityShock += Number(effects.liquidityImpact || 0) * 0.001;
+  }
+
   return {
-    meta: state.meta,
-    runtime: state.runtime,
-    defaults: state.defaults,
-    policy: state.policy,
-    prices: state.prices,
-    treasury: state.treasury,
-    circulation: state.circulation,
-    market: state.market,
-    adoption: state.adoption,
-    confidence: state.confidence,
-    dividends: state.dividends,
-    fiatDisplacement: state.fiatDisplacement,
-    scenarios: {
-      active: state.scenarios.active,
-      history: state.scenarios.history.slice(-50),
-      currentRegime: state.scenarios.currentRegime,
-      scenarioPressure: state.scenarios.scenarioPressure,
-      aftershockPressure: state.scenarios.aftershockPressure,
-      clusteringPressure: state.scenarios.clusteringPressure
-    },
-    warnings: state.warnings,
-    explanations: {
-      latest: state.explanations.latest,
-      history: state.explanations.history.slice(-50)
-    },
-    charts: state.charts
+    priceShock: clamp(output.priceShock, -0.08, 0.08),
+    volatilityShock: clamp(output.volatilityShock, -0.08, 0.12),
+    liquidityShock: clamp(output.liquidityShock, -0.1, 0.1)
   };
 }
 
-function cloneState(state) {
-  return structuredCloneSafe(state);
+function getDifficultyParams(state) {
+  const difficulty = state.defaults.difficulty || "normal";
+  const params = state.defaults.difficultyParams[difficulty];
+
+  return params || state.defaults.difficultyParams.normal;
 }
 
-function structuredCloneSafe(value) {
-  if (typeof structuredClone === "function") {
-    return structuredClone(value);
+function addPriceChartPoints(state) {
+  const point = {
+    tick: state.runtime.tick,
+    simulatedDay: state.runtime.simulatedDay,
+    createdAt: Date.now()
+  };
+
+  state.charts.monoPrice.push({
+    ...point,
+    value: state.prices.mono.market
+  });
+
+  state.charts.divPrice.push({
+    ...point,
+    value: state.prices.div.market
+  });
+}
+
+function percentToUnit(value) {
+  return clamp(Number(value || 0) / 100, 0, 1);
+}
+
+function clamp(value, min, max) {
+  const number = Number(value);
+
+  if (!Number.isFinite(number)) {
+    return min;
   }
 
-  return JSON.parse(JSON.stringify(value));
+  return Math.min(max, Math.max(min, number));
 }
 
 module.exports = {
-  createInitialState,
-  createPublicState,
-  cloneState
+  runPriceMarketEngine
 };
