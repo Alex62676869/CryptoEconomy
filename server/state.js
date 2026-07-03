@@ -1,5 +1,11 @@
 "use strict";
 
+journal: state.journal,
+
+  journal: {
+  entries: []
+},
+
 function createInitialState() {
   const now = Date.now();
 
