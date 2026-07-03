@@ -4,13 +4,6 @@ const {
   createInterestJournalEntry
 } = require("../journal");
 
-createInterestJournalEntry({
-  state,
-  interestUsd: interestReceived,
-  treasuryFiatUsd: state.treasury.fiat.totalUsdNominal
-});
-
-
 function runTreasuryFiatAllocationEngine(state, context = {}) {
   const tickContext = context.tickContext || {};
   const simulatedDays = Math.max(1, Number(tickContext.simulatedDays || 1));
@@ -26,6 +19,8 @@ function runTreasuryFiatAllocationEngine(state, context = {}) {
     state,
     scenarioEffects
   });
+
+  const fiatBeforeReturns = sumUsd(Object.values(state.fiatCurrencies || {}));
 
   applyCurrencyReturns({
     state,
@@ -43,6 +38,17 @@ function runTreasuryFiatAllocationEngine(state, context = {}) {
     state,
     scenarioEffects
   });
+
+  const fiatAfterReturns = Number(state.treasury.fiat.totalUsdNominal || 0);
+  const interestReceived = fiatAfterReturns - fiatBeforeReturns;
+
+  if (interestReceived > 0.5) {
+    createInterestJournalEntry({
+      state,
+      interestUsd: interestReceived,
+      treasuryFiatUsd: fiatAfterReturns
+    });
+  }
 
   updateFiatUsefulnessScore({
     state,
@@ -188,10 +194,6 @@ function withdrawFiatUsd({ state, amountUsd }) {
     return;
   }
 
-  /*
-    Withdrawals should come from the most liquid and safest accounts first.
-    This mirrors the treasury using support liquidity during buybacks.
-  */
   const withdrawalOrder = accounts
     .filter((account) => account.usdEquivalent > 0)
     .map((account) => ({
@@ -549,12 +551,6 @@ function updateFiatUsefulnessScore({ state, scenarioEffects }) {
   );
 
   fiat.fiatUsefulnessScore = score;
-
-  /*
-    The fiat displacement engine also stores a fiat usefulness score.
-    Keep the high-level score in sync here. The displacement engine may later
-    apply additional social/adoption effects to the same value.
-  */
   state.fiatDisplacement.fiatUsefulnessScore = score;
 }
 
@@ -866,11 +862,6 @@ function findBestMarginalCurrency(state) {
 }
 
 function convertUsdToLocal({ account, usdAmount }) {
-  /*
-    v1 does not yet model live FX rates.
-    Local balance is therefore a display/control proxy equal to USD-equivalent
-    units. Later, currencyModel.json can add actual FX rates.
-  */
   return Math.max(0, Number(usdAmount || 0));
 }
 
