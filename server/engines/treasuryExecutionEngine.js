@@ -1,5 +1,36 @@
 "use strict";
 
+const {
+  createTradeJournalEntry,
+  createDividendJournalEntry
+} = require("../journal");
+
+createTradeJournalEntry({
+  state,
+  category: "treasury",
+  source: "Treasury",
+  asset,
+  action: "treasury_sold",
+  amount: coinsSold,
+  usd: executedBuyUsd
+});
+
+createTradeJournalEntry({
+  state,
+  category: "treasury",
+  source: "Treasury",
+  asset,
+  action: "treasury_bought",
+  amount: executedSellCoins,
+  usd: fiatSpent
+});
+
+createDividendJournalEntry({
+  state,
+  divAmount: distributedDiv,
+  monoSupply: state.circulation.mono.supply
+});
+
 function runTreasuryExecutionEngine(state, context = {}) {
   const tickContext = context.tickContext || {};
   const simulatedDays = Number(tickContext.simulatedDays || 1);
