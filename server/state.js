@@ -1,11 +1,5 @@
 "use strict";
 
-journal: state.journal,
-
-  journal: {
-  entries: []
-},
-
 function createInitialState() {
   const now = Date.now();
 
@@ -263,6 +257,10 @@ function createInitialState() {
     history: {
       events: [],
       snapshots: []
+    },
+
+    journal: {
+      entries: []
     }
   };
 }
@@ -441,7 +439,6 @@ function createInitialCurrencyAccounts() {
     ["NZD", "New Zealand", 0.04, 0.025, 0.008, 84, 35, 78],
     ["SGD", "Singapore", 0.03, 0.02, 0.002, 92, 45, 88],
     ["HKD", "Hong Kong", 0.035, 0.025, 0.003, 76, 45, 78],
-
     ["NOK", "Norway", 0.035, 0.025, 0.008, 88, 35, 82],
     ["SEK", "Sweden", 0.03, 0.025, 0.008, 86, 45, 82],
     ["DKK", "Denmark", 0.025, 0.02, 0.004, 88, 35, 84],
@@ -449,7 +446,6 @@ function createInitialCurrencyAccounts() {
     ["PLN", "Poland", 0.05, 0.035, 0.018, 74, 35, 68],
     ["CZK", "Czech Republic", 0.045, 0.03, 0.015, 76, 25, 68],
     ["ILS", "Israel", 0.035, 0.025, 0.012, 74, 25, 65],
-
     ["CNY", "China", 0.025, 0.02, 0.015, 55, 95, 40],
     ["INR", "India", 0.065, 0.045, 0.035, 58, 75, 48],
     ["MXN", "Mexico", 0.08, 0.045, 0.035, 56, 45, 50],
@@ -461,7 +457,6 @@ function createInitialCurrencyAccounts() {
     ["PHP", "Philippines", 0.055, 0.04, 0.035, 50, 25, 42],
     ["CLP", "Chile", 0.065, 0.04, 0.035, 58, 20, 48],
     ["COP", "Colombia", 0.085, 0.055, 0.05, 46, 20, 38],
-
     ["AED", "United Arab Emirates", 0.035, 0.025, 0.003, 72, 35, 65],
     ["SAR", "Saudi Arabia", 0.035, 0.025, 0.004, 70, 45, 62]
   ];
@@ -483,6 +478,7 @@ function createInitialCurrencyAccounts() {
       region,
       localBalance: code === "USD" ? 1_000_000 : 0,
       usdEquivalent: code === "USD" ? 1_000_000 : 0,
+      realUsdEquivalent: code === "USD" ? 1_000_000 : 0,
       nominalYield,
       inflation,
       expectedFxDecay,
@@ -495,6 +491,8 @@ function createInitialCurrencyAccounts() {
       capitalControlPenalty: code === "CNY" ? 35 : 0,
       saturationLevel: 0,
       localM2Share: 0,
+      portfolioWeight: code === "USD" ? 1 : 0,
+      marginalAllocationScore: 0,
       riskWarning: null
     };
   }
@@ -511,6 +509,7 @@ function createPublicState(state) {
     prices: state.prices,
     treasury: state.treasury,
     circulation: state.circulation,
+    fiatCurrencies: state.fiatCurrencies,
     market: state.market,
     adoption: state.adoption,
     confidence: state.confidence,
@@ -529,7 +528,8 @@ function createPublicState(state) {
       latest: state.explanations.latest,
       history: state.explanations.history.slice(-50)
     },
-    charts: state.charts
+    charts: state.charts,
+    journal: state.journal
   };
 }
 
