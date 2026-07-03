@@ -1,5 +1,19 @@
 "use strict";
 
+const {
+  createTradeJournalEntry
+} = require("../journal");
+
+createTradeJournalEntry({
+  state,
+  category: "peer",
+  source: "Peer",
+  asset,
+  action: "peer_sold",
+  amount: peerCoins,
+  usd: peerUsd
+});
+
 function runPriceMarketEngine(state, context = {}) {
   const tickContext = context.tickContext || {};
   const simulatedDays = Number(tickContext.simulatedDays || 1);
