@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>Journal | Mono & DIV</title>
+
+  <style>
+    :root {
+      --bg: #050712;
+      --panel: #070b16;
+      --text: #dbeafe;
+      --muted: #64748b;
+      --green: #86efac;
+      --blue: #93c5fd;
+      --purple: #c4b5fd;
+      --gold: #facc15;
+      --white: #f8fafc;
+      --yellow: #fde68a;
+      --red: #fca5a5;
+      --line: rgba(148, 163, 184, 0.16);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: var(--bg);
+      color: var(--text);
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+    }
+
+    .terminal {
+      min-height: 100vh;
+      padding: 18px;
+      background:
+        radial-gradient(circle at 20% -10%, rgba(59, 130, 246, 0.12), transparent 28%),
+        radial-gradient(circle at 80% 0%, rgba(168, 85, 247, 0.1), transparent 28%),
+        var(--bg);
+    }
+
+    .terminal-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 14px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .title {
+      display: grid;
+      gap: 4px;
+    }
+
+    h1 {
+      margin: 0;
+      color: var(--text);
+      font-size: 15px;
+      font-weight: 800;
+      letter-spacing: 0.02em;
+    }
+
+    .subtitle {
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .status {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--muted);
+      font-size: 12px;
+      white-space: nowrap;
+    }
+
+    .dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 999px;
+      background: var(--yellow);
+      box-shadow: 0 0 18px rgba(253, 230, 138, 0.4);
+    }
+
+    .dot.online {
+      background: var(--green);
+      box-shadow: 0 0 18px rgba(134, 239, 172, 0.45);
+    }
+
+    .controls {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-bottom: 14px;
+    }
+
+    button,
+    a {
+      min-height: 34px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0 11px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      color: var(--text);
+      background: rgba(15, 23, 42, 0.65);
+      font-family: inherit;
+      font-size: 12px;
+      text-decoration: none;
+      cursor: pointer;
+    }
+
+    button:hover,
+    a:hover {
+      border-color: rgba(148, 163, 184, 0.35);
+      background: rgba(30, 41, 59, 0.7);
+    }
+
+    .console {
+      min-height: calc(100vh - 115px);
+      padding: 14px;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: rgba(2, 6, 23, 0.72);
+      overflow: auto;
+      box-shadow: inset 0 0 60px rgba(0, 0, 0, 0.25);
+    }
+
+    .console-row {
+      display: grid;
+      grid-template-columns: 92px 112px minmax(420px, 1fr) 118px;
+      gap: 12px;
+      margin-bottom: 6px;
+      font-size: 13px;
+      line-height: 1.42;
+      white-space: nowrap;
+    }
+
+    .console-row__tick {
+      color: var(--muted);
+    }
+
+    .console-row__source {
+      color: var(--muted);
+    }
+
+    .console-row__message {
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .console-row__price {
+      text-align: right;
+      font-weight: 800;
+      letter-spacing: 0.01em;
+    }
+
+    .console-row.bought .console-row__message,
+    .console-row.bought .console-row__price {
+      color: var(--green);
+    }
+
+    .console-row.sold .console-row__message,
+    .console-row.sold .console-row__price {
+      color: var(--gold);
+    }
+
+    .console-row.peer .console-row__message,
+    .console-row.peer .console-row__price {
+      color: var(--blue);
+    }
+
+    .console-row.dividend .console-row__message,
+    .console-row.dividend .console-row__price,
+    .console-row.interest .console-row__message,
+    .console-row.interest .console-row__price {
+      color: var(--white);
+    }
+
+    .console-row.system .console-row__message,
+    .console-row.system .console-row__price {
+      color: var(--muted);
+    }
+
+    @media (max-width: 900px) {
+      .console-row {
+        grid-template-columns: 78px 94px minmax(260px, 1fr) 108px;
+        gap: 8px;
+        font-size: 12px;
+      }
+    }
+
+    @media (max-width: 700px) {
+      .terminal {
+        padding: 12px;
+      }
+
+      .terminal-header {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+
+      .console {
+        min-height: calc(100vh - 160px);
+      }
+
+      .console-row {
+        grid-template-columns: 1fr;
+        white-space: normal;
+        padding-bottom: 8px;
+        margin-bottom: 8px;
+        border-bottom: 1px solid rgba(148, 163, 184, 0.1);
+      }
+
+      .console-row__price {
+        text-align: left;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <main class="terminal">
+    <header class="terminal-header">
+      <div class="title">
+        <h1>Mono & DIV Treasury Journal</h1>
+        <div class="subtitle">Live transaction log: treasury trades, peer trades, dividends, and interest</div>
+      </div>
+
+      <div class="status">
+        <span class="dot" id="statusDot"></span>
+        <span id="statusText">Connecting</span>
+      </div>
+    </header>
+
+    <div class="controls">
+      <a href="/" target="_blank" rel="noopener noreferrer">Dashboard</a>
+      <a href="/economy" target="_blank" rel="noopener noreferrer">Economy</a>
+      <a href="/treasury" target="_blank" rel="noopener noreferrer">Treasury</a>
+      <button type="button" id="clearButton">Clear screen</button>
+      <button type="button" id="pauseButton">Pause</button>
+    </div>
+
+    <section class="console" id="console">
+      <div class="console-row system">
+        <div class="console-row__tick">[System]</div>
+        <div class="console-row__source"></div>
+        <div class="console-row__message">Waiting for journal entries...</div>
+        <div class="console-row__price"></div>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    "use strict";
+
+    const consoleEl = document.getElementById("console");
+    const clearButton = document.getElementById("clearButton");
+    const pauseButton = document.getElementById("pauseButton");
+    const statusDot = document.getElementById("statusDot");
+    const statusText = document.getElementById("statusText");
+
+    let seenIds = new Set();
+    let paused = false;
+    let latestEntries = [];
+
+    clearButton.addEventListener("click", () => {
+      consoleEl.innerHTML = "";
+      seenIds = new Set();
+      renderEntries(latestEntries);
+    });
+
+    pauseButton.addEventListener("click", () => {
+      paused = !paused;
+      pauseButton.textContent = paused ? "Resume" : "Pause";
+    });
+
+    fetchJournal();
+    setInterval(fetchJournal, 1000);
+
+    async function fetchJournal() {
+      try {
+        const response = await fetch("/api/state", {
+          headers: {
+            Accept: "application/json"
+          }
+        });
+
+        if (!response.ok) {
+          throw new Error(`State request failed with ${response.status}`);
+        }
+
+        const state = await response.json();
+        const entries = state?.journal?.entries || [];
+
+        latestEntries = entries;
+        setStatus(true);
+
+        if (!paused) {
+          renderEntries(entries);
+        }
+      } catch (error) {
+        setStatus(false);
+      }
+    }
+
+    function renderEntries(entries) {
+      const visibleEntries = Array.isArray(entries) ? entries : [];
+
+      if (visibleEntries.length === 0 && consoleEl.children.length === 0) {
+        appendEntry({
+          id: "empty",
+          category: "system",
+          source: "System",
+          message: "No journal entries yet.",
+          priceColumn: ""
+        });
+
+        return;
+      }
+
+      if (consoleEl.textContent.includes("Waiting for journal entries")) {
+        consoleEl.innerHTML = "";
+      }
+
+      for (const entry of visibleEntries) {
+        const id = entry.id || `${entry.tick}-${entry.message}-${entry.priceColumn}`;
+
+        if (seenIds.has(id)) {
+          continue;
+        }
+
+        seenIds.add(id);
+        appendEntry(entry);
+      }
+
+      consoleEl.scrollTop = consoleEl.scrollHeight;
+    }
+
+    function appendEntry(entry) {
+      const row = document.createElement("div");
+      const category = normaliseCategory(entry);
+
+      row.className = `console-row ${category}`;
+
+      const tick = document.createElement("div");
+      tick.className = "console-row__tick";
+      tick.textContent = Number.isFinite(Number(entry.tick))
+        ? `[Tick ${entry.tick}]`
+        : "[System]";
+
+      const source = document.createElement("div");
+      source.className = "console-row__source";
+      source.textContent = `[${entry.source || sourceFromCategory(entry.category)}]`;
+
+      const message = document.createElement("div");
+      message.className = "console-row__message";
+      message.textContent = entry.message || "Unknown journal entry";
+
+      const price = document.createElement("div");
+      price.className = "console-row__price";
+      price.textContent = entry.priceColumn || "";
+
+      row.appendChild(tick);
+      row.appendChild(source);
+      row.appendChild(message);
+      row.appendChild(price);
+
+      consoleEl.appendChild(row);
+    }
+
+    function normaliseCategory(entry) {
+      if (entry.category === "peer") return "peer";
+      if (entry.category === "dividend") return "dividend";
+      if (entry.category === "interest") return "interest";
+      if (entry.action && entry.action.includes("bought")) return "bought";
+      if (entry.action && entry.action.includes("sold")) return "sold";
+      return entry.category || "system";
+    }
+
+    function sourceFromCategory(category) {
+      if (category === "peer") return "Peer";
+      if (category === "dividend") return "Treasury";
+      if (category === "interest") return "Treasury";
+      if (category === "treasury") return "Treasury";
+      return "System";
+    }
+
+    function setStatus(isOnline) {
+      statusDot.classList.toggle("online", isOnline);
+      statusText.textContent = isOnline ? "Live" : "Offline";
+    }
+  </script>
+</body>
+</html>
